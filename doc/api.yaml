@@ -1,0 +1,437 @@
+openapi: 3.0.3
+info:
+  title: WASAphoto
+  description: |-
+    Versione 1 del progetto WASA.
+  version: "1"
+
+security:
+  - controllo: []
+components:
+  securitySchemes: 
+    controllo:
+      type: http
+      scheme: bearer
+  schemas:
+    user:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+          #minLenght: 3
+          #maxLenght: 16
+        followings:
+          type: object
+        followers:
+          type: object
+        photos:
+          type: object
+        profile:
+          type: object
+    photo:
+      type: object
+      properties:
+        id_photo:
+          type: integer
+        likes:
+          type: integer
+        comments:
+          type: integer
+    like:
+      type: integer
+    comment:
+      type: string
+      properties:
+        time_stamp:
+          type: string
+          format: date-time
+    stream:
+      type: object
+
+
+
+
+
+paths:
+  /login:
+    post:
+      tags: ["login"]
+      summary: Logga l'user
+      description: |-
+        Se l'user non esiste, allora viene creato. Altrimenti ritorna l'ID.
+      security:
+        - controllo: []
+      operationId: doLogin
+      requestBody:
+        description: User details
+        #required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  #minlenght: 3
+                  #maxLenght: 16
+        required: true
+      responses:
+        '201':
+          description: Login effettuato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:    #identifico l'utente loggato
+                    type: integer
+                    #id: integer
+  /username:
+    post:
+      tags: ["username"]
+      summary: Imposta nome utente
+      operationId: setMyUserName
+      security:
+        - controllo: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: controllo se l'utente è autorizzato
+                username:
+                  type: string
+                  description: Nuovo nome utente desiderato
+                  #minLenght: 3
+                  #maxLenght: 16
+      responses:
+        '200':
+          description: Nome utente impostato con successo
+        '400':
+          description: Errore nei dati della richiesta
+        '404':
+          description: Indirizzo email non trovato
+
+  /user/username:
+    put:
+      tags: ["username"]
+      summary: Aggiorna nome utente
+      operationId: UpdateMyUsername
+      description: Consente agli utenti di aggiornare il proprio username.
+      security:
+        - controllo: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                old_username:
+                  type: string
+                  description: Vecchio username impostato
+                  #minLenght: 3
+                  #maxLenght: 16
+                new_username:
+                  type: string
+                  description: Nuovo username desiderato
+                  #minLenght: 3
+                  #maxLenght: 16
+      responses:
+        '200':
+          description: Username aggiornato con successo
+        '400':
+          description: Errore nei dati della richiesta
+        '404':
+          description: Indirizzo email non trovato
+
+  /photo/id_photo:
+    post:
+      tags: ["photo"]
+      summary: Carica nuova foto
+      operationId: uploadPhoto
+      description: Consente il caricamento di una foto nel feed
+      security:
+        - controllo: []
+      requestBody: 
+        required: true
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/photo'
+      responses:
+        '400':
+          description: Errore nei dati della richiesta
+        '200':
+          description: Immagine correttamente caricata
+
+  /user/followings:
+    post:
+      summary: Seguire un'utente
+      operationId: followUser
+      security:
+        - controllo: []
+      requestBody:
+          description: ID di chi deve essere seguito
+          required: true
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/user'
+      responses:
+        '200':
+          description: utente seguito!
+        '400':
+          description: Errore nei dati della richiesta
+
+  /user/unfollowings:
+    post:
+      summary: smettere di seguire un'utente
+      operationId: unfollowUser
+      security:
+        - controllo: []
+      requestBody:
+        description: id di chi viene smesso di seguire
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+      responses:
+        '200':
+          description: utente seguito!
+        '400':
+          description: Errore nei dati della richiesta
+
+  /user/{user_id}/user/{user_to_ban_id}:
+    post:
+      summary: Bloccare un utente
+      operationId: banUser
+      security:
+        - controllo: []
+      parameters:
+      - name: user_id
+        in: path
+        description: chi banna
+        required: true
+        content:
+          application/json: 
+            schema:
+              $ref: '#/components/schemas/user'
+      - name: user_to_ban_id
+        in: path 
+        description: chi viene bloccato
+        required: true
+        content:
+          application/json: 
+            schema:
+              $ref: '#/components/schemas/user'
+      responses:
+        '200':
+          description: Utente bloccato
+        '400':
+          description: Errore nei dati della richiesta
+  /user/{user_id}/bans/{user_to_unban_id}:
+    post:
+      summary: Sbloccare un utente
+      operationId: unbanUser
+      security:
+        - controllo: []
+      parameters:
+      - name: user_id
+        in: path
+        description: chi unbanna
+        required: true
+        content:
+          application/json: 
+            schema:
+              $ref: '#/components/schemas/user'
+      - name: user_to_unban_id
+        in: path 
+        description: chi viene sbloccato
+        required: true
+        content:
+          application/json: 
+            schema:
+              $ref: '#/components/schemas/user'
+      responses:
+        '200':
+          description: Utente bloccato
+        '400':
+          description: Errore nei dati della richiesta
+  /user/id/profile:
+    get:
+      summary: Visualizza il mio profilo
+      operationId: getUserProfile
+      description: permette all'utente di visualizzare il proprio profilo
+      security:
+        - controllo: []
+      responses:
+        "200":
+          description: Profilo visualizzato con successo
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/user'
+        "401":
+          description: Errore nella richiesta
+  /stream:
+    get:
+      summary: Visualizza la home
+      operationId: getMyStream
+      description: Permette all'utente di visualizzare lo stream
+      security:
+        - controllo: []
+      responses:
+        "200":
+          description: Stream visualizzato con successo
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/stream'
+        "401":
+          description: Errore nella richiesta
+  /user/user_id/photo/photo_to_like_id:
+    put:
+      summary: Mettere mi piace ad una foto
+      operationId: likePhoto
+      description: Permette all'utente di mettere like a una foto
+      security:
+        - controllo: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  $ref: '#/components/schemas/user'
+                photo_to_like_id:
+                  $ref: '#/components/schemas/photo'
+      responses:
+        "200":
+          description: Like avvenuto con successo
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/like'
+        "401":
+          description: Errore nella richiesta
+  /user/user_id/photo/photo_to_unlike_id:
+    put:
+      summary: Togliere mi piace ad una foto
+      operationId: unlikePhoto
+      description: Permette all'utente di togliere like a una foto
+      security:
+        - controllo: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  $ref: '#/components/schemas/user'
+                photo_to_unlike_id:
+                  $ref: '#/components/schemas/photo'
+      responses:
+        "200":
+          description: Like tolto con successo
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/like'
+        "401":
+          description: Errore nella richiesta
+  /user/user_id/photo/photo_to_comment_id:
+    put:
+      summary: Commentare una foto
+      operationId: commentPhoto
+      description: Permette all'utente di commentare una foto
+      security:
+        - controllo: []
+      requestBody: 
+        required: true
+        content:
+          application/json: 
+            schema:
+              type: object 
+              properties:
+                user_id:
+                  $ref: '#/components/schemas/user'
+                photo_to_comment_id:
+                  $ref: '#/components/schemas/photo'
+      responses:
+        '200':
+          description: Commentato con successo
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/comment'
+        '401':
+          description: Errore nella richiesta
+  /user/user_id/photo/photo_to_uncomment_id:
+    put:
+      summary: Cancellare un commento da una foto
+      operationId: uncommentPhoto
+      description: Permette all'utente di cancellare un commento da una foto
+      security:
+        - controllo: []
+      requestBody: 
+        required: true
+        content:
+          application/json: 
+            schema:
+              type: object 
+              properties:
+                user_id:
+                  $ref: '#/components/schemas/user'
+                photo_to_uncomment_id:
+                  $ref: '#/components/schemas/photo'
+      responses:
+        '200':
+          description: Commento cancellato con successo
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/comment'
+        '401':
+          description: Errore nella richiesta
+  /user/photos/id_photo:
+    get:
+      operationId: findPhoto
+      summary: Restituisce la foto che si desidera cancellare
+      security:
+        - controllo: []
+      responses:
+        "200":
+          description: Foto trovata con successo
+          content:
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/user'
+        "401":
+          description: Errore nella richiesta      
+
+    delete:
+      operationId: deletePhoto
+      summary: cancella la foto
+      security:
+        - controllo: []
+      responses:
+        "200":
+          description: foto cancellata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+
+
