@@ -31,6 +31,7 @@ Then you can initialize the AppDatabase and pass it to the api package.
 package database
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -38,14 +39,18 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	GetName() (string, error)
-	SetName(name string) error
-
+	//Create user in the database
+	Create_user(u User) (User, error)
+	//search an user by username
+	Get_user(username string) (User, error)
+	//set the username of the user
+	Set_username(username string) error
 	Ping() error
 }
 
 type appdbimpl struct {
-	c *sql.DB
+	c   *sql.DB
+	ctx context.Context
 }
 
 // New returns a new instance of AppDatabase based on the SQLite connection `db`.
@@ -55,19 +60,64 @@ func New(db *sql.DB) (AppDatabase, error) {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
 
-	// Check if table exists. If not, the database is empty, and we need to create the structure
-	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+	// Check if tables exists. If not, the database is empty, and we need to create the structure and the tables
+	var user_table string
+	err := db.QueryRow(`SELECT user_table FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&user_table)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
-		_, err = db.Exec(sqlStmt)
+		_, err = db.Exec(user_table)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	var post_table string
+	err = db.QueryRow(`SELECT post_table FROM sqlite_master WHERE type='table' AND name='post_table';`).Scan(&post_table)
+	if errors.Is(err, sql.ErrNoRows) {
+		_, err = db.Exec(post_table)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	var like_table string
+	err = db.QueryRow(`SELECT like_table FROM sqlite_master WHERE type='table' AND name='like_table';`).Scan(&like_table)
+	if errors.Is(err, sql.ErrNoRows) {
+		_, err = db.Exec(like_table)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	var comment_table string
+	err = db.QueryRow(`SELECT comment_table FROM sqlite_master WHERE type='table' AND name='comment_table';`).Scan(&comment_table)
+	if errors.Is(err, sql.ErrNoRows) {
+		_, err = db.Exec(comment_table)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	var follow_table string
+	err = db.QueryRow(`SELECT follow_table FROM sqlite_master WHERE type='table' AND name='follow_table';`).Scan(&follow_table)
+	if errors.Is(err, sql.ErrNoRows) {
+		_, err = db.Exec(follow_table)
+		if err != nil {
+			return nil, fmt.Errorf("error creating database structure: %w", err)
+		}
+	}
+
+	var ban_table string
+	err = db.QueryRow(`SELECT ban_table FROM sqlite_master WHERE type='table' AND name='ban_table';`).Scan(&ban_table)
+	if errors.Is(err, sql.ErrNoRows) {
+		_, err = db.Exec(ban_table)
 		if err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
 		}
 	}
 
 	return &appdbimpl{
-		c: db,
+		c:   db,
+		ctx: context.Background(),
 	}, nil
 }
 

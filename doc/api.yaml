@@ -57,16 +57,15 @@ components:
 paths:
   /login:
     post:
-      tags: ["login"]
-      summary: Logga l'user
-      description: |-
-        Se l'user non esiste, allora viene creato. Altrimenti ritorna l'ID.
-      security:
-        - controllo: []
+      tags: 
+        - "login"
+      summary: Log in a user
+      description:
+        Logs in the user. If the user does not exist, it will be created. Otherwise, returns the user ID.
       operationId: doLogin
       requestBody:
         description: User details
-        #required: true
+        required: true
         content:
           application/json:
             schema:
@@ -74,20 +73,27 @@ paths:
               properties:
                 name:
                   type: string
-                  #minlenght: 3
-                  #maxLenght: 16
-        required: true
+                  minLength: 3
+                  maxLength: 16
+              example:
+                name: "example_user"
       responses:
         '201':
-          description: Login effettuato
+          description: User logged in successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  identifier:    #identifico l'utente loggato
+                  identifier:
                     type: integer
-                    #id: integer
+              example:
+                identifier: 123
+        '400':
+          description: Bad request. Invalid input data.
+        '500':
+          description: Internal server error. Failed to process the request.
+
   /username:
     post:
       tags: ["username"]
