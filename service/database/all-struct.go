@@ -1,19 +1,29 @@
 package database
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
-	userID   int
-	username string
+	UserID   int
+	Username string
 }
 
 type Photo struct {
-	photoID		int
-	User		User
-	URL			string
-	caption		string
-	nlike		int
-	ncomment	int
-	liked		bool
-	created_at	time.Time
+	PhotoID    int
+	User       User
+	URL        string
+	ImageData  []byte
+	Caption    string
+	Nlike      int
+	Ncomment   int
+	Liked      bool
+	Created_At time.Time
+}
+
+type Comment struct {
+	CommentID  int
+	User       User
+	Lyric      string
+	Created_At time.Time
 }

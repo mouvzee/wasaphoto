@@ -7,38 +7,41 @@ import (
 )
 
 type Photo struct {
-	photoID    int
+	PhotoID    int
 	User       User
 	URL        string
-	caption    string
-	nlike      int
-	ncomment   int
-	liked      bool
-	created_at time.Time
+	ImageData  []byte
+	Caption    string
+	Nlike      int
+	Ncomment   int
+	Liked      bool
+	Created_At time.Time
 }
 
 func (y *Photo) AddingUser(user User) Photo {
 	return Photo{
-		photoID:    y.photoID,
-		User:       User{userID: user.userID, username: user.username},
+		PhotoID:    y.PhotoID,
+		User:       User{UserID: user.UserID, Username: user.Username},
 		URL:        y.URL,
-		caption:    y.caption,
-		nlike:      y.nlike,
-		ncomment:   y.ncomment,
-		liked:      y.liked,
-		created_at: y.created_at,
+		ImageData:  y.ImageData,
+		Caption:    y.Caption,
+		Nlike:      y.Nlike,
+		Ncomment:   y.Ncomment,
+		Liked:      y.Liked,
+		Created_At: y.Created_At,
 	}
 }
 
 func (y *Photo) SavingPhoto() database.Photo {
 	return database.Photo{
-		photoID:    y.photoID,
-		User:       database.User{user: y.User.userID, username: y.User.username},
+		PhotoID:    y.PhotoID,
+		User:       database.User{UserID: y.User.UserID, Username: y.User.Username},
 		URL:        y.URL,
-		caption:    y.caption,
-		nlike:      y.nlike,
-		ncomment:   y.ncomment,
-		liked:      y.liked,
-		created_at: y.created_at,
+		ImageData:  y.ImageData,
+		Caption:    y.Caption,
+		Nlike:      y.Nlike,
+		Ncomment:   y.Ncomment,
+		Liked:      y.Liked,
+		Created_At: y.Created_At,
 	}
 }

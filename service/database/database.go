@@ -45,6 +45,10 @@ type AppDatabase interface {
 	Get_user(username string) (User, error)
 	//set the username of the user
 	Set_username(username string) error
+	//Post a photo in the user profile
+	Post_Photo(y Photo, ImageData []byte) error
+	//Delete a photo in the user profile
+	Delete_Photo(y Photo, URL string) error
 	Ping() error
 }
 

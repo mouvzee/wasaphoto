@@ -11,7 +11,7 @@ var findID = `SELECT userID FROM User`
 
 func (db *appdbimpl) Create_user(x User) (User, error) {
 	var user User
-	user.username = x.username
+	user.Username = x.Username
 
 	//userID
 	var id = sql.NullInt64{Int64: 0, Valid: false}
@@ -33,14 +33,14 @@ func (db *appdbimpl) Create_user(x User) (User, error) {
 	}
 
 	//create a folder for the user with userID in the path
-	p := "./users-data/" + fmt.Sprint(user.userID) + "/pubblications"
+	p := "./users-data/" + fmt.Sprint(user.UserID) + "/pubblications"
 	err = os.MkdirAll(p, os.ModePerm)
 	if err != nil {
 		return user, err
 	}
 
 	//insert User in the database
-	_, err = db.c.Exec(adduser, user.userID, user.username)
+	_, err = db.c.Exec(adduser, user.UserID, user.Username)
 	if err != nil {
 		return user, err
 	}
