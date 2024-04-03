@@ -48,7 +48,7 @@ type AppDatabase interface {
 	//Post a photo in the user profile
 	Post_Photo(y Photo, ImageData []byte) error
 	//Delete a photo in the user profile
-	Delete_Photo(y Photo, URL string) error
+	Delete_Photo(UserID int, PhotoID int) error
 	Ping() error
 }
 
