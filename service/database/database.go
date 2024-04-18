@@ -42,7 +42,9 @@ type AppDatabase interface {
 	//Create user in the database
 	Create_user(u User) (User, error)
 	//search an user by username
-	Get_user(username string) (User, error)
+	Get_user_byUsername(username string) (User, error)
+	//get user by ID
+	Get_user_byID(UserID int) (User, error)
 	//set the username of the user
 	Set_username(username string) error
 	//Post a photo in the user profile
