@@ -2,15 +2,14 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
-	"github.com/mouvzee/wasaphoto/"
+	//"github.com/mouvzee/wasaphoto/service/api/methods"
 )
 
 var DelPhoto = "DELETE FROM Photo WHERE UserID=? AND PhotoID=?"
 
 func (db *appdbimpl) Delete_Photo(UserID int, PhotoID int) error {
-	//get the id of the user that wants to delete the photo
-	user, err := db.Get_user_byID(UserID)
 	tx, err := db.c.BeginTx(db.ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
 	if err != nil {
 		return err
@@ -30,10 +29,14 @@ func (db *appdbimpl) Delete_Photo(UserID int, PhotoID int) error {
 	}
 
 	// Delete file
-	err = os.Remove(user.GetPath(UserID, PhotoID))
+	err = os.Remove(GetPath(UserID, PhotoID))
 	if err != nil {
 		return err
 	}
 
 	return err
+}
+
+func GetPath(UserID, PhotoID int) string {
+	return fmt.Sprintf("./users/%d/posts/%d.jpeg", UserID, PhotoID)
 }

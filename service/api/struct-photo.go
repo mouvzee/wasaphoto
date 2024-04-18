@@ -3,7 +3,7 @@ package api
 import (
 	"time"
 
-	"git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/database"
+	"github.com/mouvzee/wasaphoto/service/database"
 )
 
 type Photo struct {

@@ -1,15 +1,15 @@
 package api
 
-import "git.sapienzaapps.it/fantasticcoffee/fantastic-coffee-decaffeinated/service/database"
+import "github.com/mouvzee/wasaphoto/service/database"
 
 type User struct {
-	UserID   int   
-	Username string 
+	UserID   int
+	Username string
 }
 
 func (x *User) savingUser() database.User {
 	return database.User{
-		UserID: x.UserID,
+		UserID:   x.UserID,
 		Username: x.Username,
 	}
 }
