@@ -27,3 +27,11 @@ type Comment struct {
 	Lyric      string
 	Created_At time.Time
 }
+
+type Profile struct {
+	User       User
+	Name       string
+	Follower   int
+	Following  int
+	IsFollowed bool
+}
