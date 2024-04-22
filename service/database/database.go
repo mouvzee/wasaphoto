@@ -42,7 +42,7 @@ type AppDatabase interface {
 	//Create user in the database
 	Create_user(u User) (User, error)
 	//search an user by username
-	Get_user_byUsername(username string) (User, error)
+	Get_User_ByUsername(username string) (User, error)
 	//get user by ID
 	Get_user_byID(UserID int) (User, error)
 	//set the username of the user
@@ -51,6 +51,8 @@ type AppDatabase interface {
 	Post_Photo(y Photo, ImageData []byte) error
 	//Delete a photo in the user profile
 	Delete_Photo(UserID int, PhotoID int) error
+	//check if the username is already token
+	CheckIfExist(Username string) (bool, error)
 	Ping() error
 }
 

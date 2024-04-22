@@ -1,6 +1,10 @@
 package api
 
-import "github.com/mouvzee/wasaphoto/service/database"
+import (
+	"regexp"
+
+	"github.com/mouvzee/wasaphoto/service/database"
+)
 
 type User struct {
 	UserID   int
@@ -18,4 +22,13 @@ func (x *User) takingUser(dbUser database.User) error {
 	x.UserID = dbUser.UserID
 	x.Username = dbUser.Username
 	return nil
+}
+
+func (x *User) isValid() bool {
+	username := x.Username
+	b, err := regexp.MatchString("^.{1,16}$", username)
+	if err != nil {
+		return false
+	}
+	return b
 }
