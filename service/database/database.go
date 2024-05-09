@@ -40,7 +40,7 @@ import (
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	//Create user in the database
-	Create_user(u User) (User, error)
+	CreateUser(u User) (User, error)
 	//search an user by username
 	Get_User_ByUsername(username string) (User, error)
 	//get user by ID
@@ -53,6 +53,8 @@ type AppDatabase interface {
 	Delete_Photo(UserID int, PhotoID int) error
 	//check if the username is already token
 	CheckIfExist(Username string) (bool, error)
+	//compare token and userID to know if the user is authorized
+	IsAuthorized(UserID int) (bool, error)
 	Ping() error
 }
 

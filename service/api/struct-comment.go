@@ -17,7 +17,7 @@ type Comment struct {
 //check that the comment is from a certain user and save the information from database
 func (c *Comment) takingComment(dbComment database.Comment) error {
 	var u User
-	err := u.takingUser(dbComment.User)
+	err := u.TakeUser(dbComment.User)
 	if err != nil {
 		return err
 	}

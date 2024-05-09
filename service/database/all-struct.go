@@ -5,33 +5,38 @@ import (
 )
 
 type User struct {
-	UserID   int		
-	Username string
+	UserID   int    `json:"userID"`
+	Username string `json:"username"`
 }
 
 type Photo struct {
-	PhotoID    int
-	User       User
-	URL        string
-	ImageData  []byte
-	Caption    string
-	Nlike      int
-	Ncomment   int
-	Liked      bool
-	Created_At time.Time
+	PhotoID    int       `json:"photoID"`
+	User       User      `json:"user"`
+	URL        string    `json:"URL"`
+	ImageData  []byte    `json:"imageData"`
+	Caption    string    `json:"caption"`
+	Nlike      int       `json:"nlike"`
+	Ncomment   int       `json:"ncomment"`
+	Liked      bool      `json:"liked"`
+	Created_At time.Time `json:"createdAt"`
 }
 
 type Comment struct {
-	CommentID  int
-	User       User
-	Lyric      string
-	Created_At time.Time
+	CommentID  int       `json:"commentID"`
+	User       User      `json:"user"`
+	Lyric      string    `json:"lyric"`
+	Created_At time.Time `json:"createdAt"`
 }
 
 type Profile struct {
-	User       User
-	Name       string
-	Follower   int
-	Following  int
-	IsFollowed bool
+	User       User   `json:"user"`
+	Name       string `json:"name"`
+	Follower   int    `json:"follower"`
+	Following  int    `json:"following"`
+	IsFollowed bool   `json:"isFollowed"`
+}
+
+type Authorization struct {
+	User  User `json:"user"`
+	Token int  `json:"token"`
 }

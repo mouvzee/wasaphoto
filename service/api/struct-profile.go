@@ -12,7 +12,7 @@ type Profile struct {
 
 func (p *Profile) takingProfile(dbProfile database.Profile) error {
 	var u User
-	err := u.takingUser(dbProfile.User)
+	err := u.TakeUser(dbProfile.User)
 	if err != nil {
 		return err
 	}

@@ -21,16 +21,20 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Get the post ID from the URL
-	PhotoID, err := strconv.Atoi(ps.ByName("postID"))
+	PhotoID, err := strconv.Atoi(ps.ByName("PostID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
 	}
-	//correggi guarda wrap prova con un token (te lo devi inventare tu)
-	userID := UserID
+
+	Token, err := strconv.Atoi(ps.ByName("Token"))
+	if err != nil {
+		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	// Check if the user is authorized
-	if UserID != userID {
+	if UserID != Token {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}

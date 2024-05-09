@@ -13,7 +13,7 @@ components:
       type: http
       scheme: bearer
   schemas:
-    user:
+    User:
       type: object
       properties:
         id:
@@ -22,34 +22,57 @@ components:
           type: string
           #minLenght: 3
           #maxLenght: 16
-        followings:
-          type: object
-        followers:
-          type: object
-        photos:
-          type: object
-        profile:
-          type: object
-    photo:
+    Photo:
       type: object
       properties:
-        id_photo:
+        photoID:
           type: integer
-        likes:
+        user: { $ref: "#/components/schemas/User"}
+        URL: 
+          type: string
+        imageData:
+          type: string
+          format: binary
+        caption:
+          type: string
+        nlike:
           type: integer
-        comments:
+        ncomment:
           type: integer
-    like:
-      type: integer
-    comment:
-      type: string
-      properties:
-        time_stamp:
+        liked: 
+          type: boolean
+        createdAt:
           type: string
           format: date-time
-    stream:
+    comment:
       type: object
-
+      properties:
+        commentID: 
+          type: integer
+        user: { $ref: "#/components/schemas/User"}
+        lyric:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    Profile:
+      type: object
+      properties:
+        user: { $ref: "#/components/schemas/User"}
+        name:
+          type: string
+        follower:
+          type: integer
+        following: 
+          type: integer
+        isFollowed:
+          type: boolean
+    Authorization:
+      type: object
+      properties:
+        user: {$ref: "#/components/schemas/User"}
+        token: 
+          type: integer
 
 
 
@@ -62,7 +85,7 @@ paths:
       summary: Log in a user
       description:
         Logs in the user. If the user does not exist, it will be created. Otherwise, returns the user ID.
-      operationId: doLogin
+      operationId: getLogin
       requestBody:
         description: User details
         required: true
@@ -71,24 +94,20 @@ paths:
             schema:
               type: object
               properties:
-                username:
-                  type: string
-                  minLength: 3
-                  maxLength: 16
+                username: { $ref: "#/components/schemas/User/properties/username"}
               example:
-                name: "example_user"
+                username: "example_user"
       responses:
         '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Authorization"}
+        '200':
           description: User logged in successfully
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  identifier:
-                    type: integer
-              example:
-                identifier: 123
+              schema: { $ref: "#/components/schemas/Authorization"}
         '400':
           description: Bad request. Invalid input data.
         '500':
@@ -157,7 +176,7 @@ paths:
         '404':
           description: Indirizzo email non trovato
 
-  /photo/id_photo:
+  /photo/photoID:
     post:
       tags: ["photo"]
       summary: Carica nuova foto
@@ -170,7 +189,7 @@ paths:
         content:
           application/json:
               schema:
-                $ref: '#/components/schemas/photo'
+                $ref: '#/components/schemas/Photo'
       responses:
         '400':
           description: Errore nei dati della richiesta
@@ -189,7 +208,7 @@ paths:
           content:
             application/json: 
               schema:
-                $ref: '#/components/schemas/user'
+                $ref: '#/components/schemas/User'
       responses:
         '200':
           description: utente seguito!
@@ -208,7 +227,7 @@ paths:
         content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user'
+                $ref: '#/components/schemas/User'
       responses:
         '200':
           description: utente seguito!
@@ -229,7 +248,7 @@ paths:
         content:
           application/json: 
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/User'
       - name: user_to_ban_id
         in: path 
         description: chi viene bloccato
@@ -237,7 +256,7 @@ paths:
         content:
           application/json: 
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/User'
       responses:
         '200':
           description: Utente bloccato
@@ -257,7 +276,7 @@ paths:
         content:
           application/json: 
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/User'
       - name: user_to_unban_id
         in: path 
         description: chi viene sbloccato
@@ -265,7 +284,7 @@ paths:
         content:
           application/json: 
             schema:
-              $ref: '#/components/schemas/user'
+              $ref: '#/components/schemas/User'
       responses:
         '200':
           description: Utente bloccato
@@ -284,7 +303,7 @@ paths:
           content:
             application/json: 
               schema:
-                $ref: '#/components/schemas/user'
+                $ref: '#/components/schemas/User'
         "401":
           description: Errore nella richiesta
   /stream:
@@ -300,7 +319,7 @@ paths:
           content:
             application/json: 
               schema:
-                $ref: '#/components/schemas/stream'
+                $ref: '#/components/schemas/Profile'
         "401":
           description: Errore nella richiesta
   /user/user_id/photo/photo_to_like_id:
@@ -318,16 +337,15 @@ paths:
               type: object
               properties:
                 user_id:
-                  $ref: '#/components/schemas/user'
+                  $ref: '#/components/schemas/User'
                 photo_to_like_id:
-                  $ref: '#/components/schemas/photo'
+                  $ref: '#/components/schemas/Photo'
       responses:
         "200":
           description: Like avvenuto con successo
           content:
             application/json: 
-              schema:
-                $ref: '#/components/schemas/like'
+              schema: {$ref: "#/components"} #RISOLVI
         "401":
           description: Errore nella richiesta
   /user/user_id/photo/photo_to_unlike_id:
@@ -345,16 +363,16 @@ paths:
               type: object
               properties:
                 user_id:
-                  $ref: '#/components/schemas/user'
+                  $ref: '#/components/schemas/User'
                 photo_to_unlike_id:
-                  $ref: '#/components/schemas/photo'
+                  $ref: '#/components/schemas/Photo'
       responses:
         "200":
           description: Like tolto con successo
           content:
             application/json: 
               schema:
-                $ref: '#/components/schemas/like'
+                $ref: '#/components/schemas/Photo/properties/nlike'
         "401":
           description: Errore nella richiesta
   /user/user_id/photo/photo_to_comment_id:
@@ -372,9 +390,9 @@ paths:
               type: object 
               properties:
                 user_id:
-                  $ref: '#/components/schemas/user'
+                  $ref: '#/components/schemas/User'
                 photo_to_comment_id:
-                  $ref: '#/components/schemas/photo'
+                  $ref: '#/components/schemas/Photo'
       responses:
         '200':
           description: Commentato con successo
@@ -399,9 +417,9 @@ paths:
               type: object 
               properties:
                 user_id:
-                  $ref: '#/components/schemas/user'
+                  $ref: '#/components/schemas/User'
                 photo_to_uncomment_id:
-                  $ref: '#/components/schemas/photo'
+                  $ref: '#/components/schemas/Photo'
       responses:
         '200':
           description: Commento cancellato con successo
@@ -411,7 +429,7 @@ paths:
                 $ref: '#/components/schemas/comment'
         '401':
           description: Errore nella richiesta
-  /user/photos/id_photo:
+  /user/photos/photoID:
     get:
       operationId: findPhoto
       summary: Restituisce la foto che si desidera cancellare
@@ -423,7 +441,7 @@ paths:
           content:
             application/json: 
               schema:
-                $ref: '#/components/schemas/user'
+                $ref: '#/components/schemas/User'
         "401":
           description: Errore nella richiesta      
 
@@ -438,6 +456,5 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user'
-
+                $ref: '#/components/schemas/User'
 

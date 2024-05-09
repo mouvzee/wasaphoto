@@ -11,14 +11,14 @@ type User struct {
 	Username string
 }
 
-func (x *User) savingUser() database.User {
+func (x *User) SaveUser() database.User {
 	return database.User{
 		UserID:   x.UserID,
 		Username: x.Username,
 	}
 }
 
-func (x *User) takingUser(dbUser database.User) error {
+func (x *User) TakeUser(dbUser database.User) error {
 	x.UserID = dbUser.UserID
 	x.Username = dbUser.Username
 	return nil

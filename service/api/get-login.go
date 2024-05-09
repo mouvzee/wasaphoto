@@ -45,7 +45,7 @@ func (rt *_router) getLogin(w http.ResponseWriter, r *http.Request, ps httproute
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		err = user.takingUser(dbUser)
+		err = user.TakeUser(dbUser)
 		if err != nil {
 			ctx.Logger.WithError(err).Error("Cannot create the user")
 			w.WriteHeader(http.StatusInternalServerError)
