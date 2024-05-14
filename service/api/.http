@@ -1,6 +1,23 @@
-POST https://localhost:3000/login HTTP/1.1
+POST http://localhost:3000/login HTTP/1.1
 content-type: application/json
 
 {
-    "username": "mouvzee",
+    "username": "mouvzee"
 }
+####
+POST http://localhost:3000/login HTTP/1.1
+content-type: application/json
+
+{
+    "username": "cizzo"
+}
+####
+
+PUT http://localhost:3000/user/1/username HTTP/1.1
+content-Type: application/json
+Authorization: 1
+
+{
+    "username" : "puzzola"
+}
+####

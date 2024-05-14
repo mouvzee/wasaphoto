@@ -16,7 +16,7 @@ components:
     User:
       type: object
       properties:
-        id:
+        userid:
           type: integer
         username:
           type: string
@@ -85,7 +85,7 @@ paths:
       summary: Log in a user
       description:
         Logs in the user. If the user does not exist, it will be created. Otherwise, returns the user ID.
-      operationId: getLogin
+      operationId: doLogin
       requestBody:
         description: User details
         required: true
@@ -113,11 +113,21 @@ paths:
         '500':
           description: Internal server error. Failed to process the request.
 
-  /username:
-    post:
-      tags: ["username"]
+  /user/{userID}/username:
+    parameters:
+      - name: userID
+        in: path
+        description: Check the userID of the user who wants to set the username
+        schema: { $ref: "#/components/schemas/User/properties/userid"}
+        required: true
+
+    put:
+      tags: ["User"]
       summary: Imposta nome utente
       operationId: setMyUserName
+      description: |-
+        Set a new username. If the username is already taken, the user
+        is not authorized or the username is not valid the request will fail.
       security:
         - controllo: []
       requestBody:
@@ -125,58 +135,22 @@ paths:
         content:
           application/json:
             schema:
+              description: New username for the user
               type: object
               properties:
-                id:
-                  type: integer
-                  description: controllo se l'utente è autorizzato
-                username:
-                  type: string
-                  description: Nuovo nome utente desiderato
-                  #minLenght: 3
-                  #maxLenght: 16
+                username: { $ref: "#/components/schemas/User/properties/username"}
       responses:
         '200':
           description: Nome utente impostato con successo
         '400':
           description: Errore nei dati della richiesta
+        '401':
+          description: Autorizzazione non concessa
         '404':
           description: Indirizzo email non trovato
 
-  /user/username:
-    put:
-      tags: ["username"]
-      summary: Aggiorna nome utente
-      operationId: UpdateMyUsername
-      description: Consente agli utenti di aggiornare il proprio username.
-      security:
-        - controllo: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                old_username:
-                  type: string
-                  description: Vecchio username impostato
-                  #minLenght: 3
-                  #maxLenght: 16
-                new_username:
-                  type: string
-                  description: Nuovo username desiderato
-                  #minLenght: 3
-                  #maxLenght: 16
-      responses:
-        '200':
-          description: Username aggiornato con successo
-        '400':
-          description: Errore nei dati della richiesta
-        '404':
-          description: Indirizzo email non trovato
 
-  /photo/photoID:
+  /photo/{photoID}/user/{userid}:
     post:
       tags: ["photo"]
       summary: Carica nuova foto

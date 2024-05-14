@@ -8,10 +8,11 @@ import (
 	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
 
-func (rt *_router) getLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+
 	var user User
 
-	err := json.NewDecoder(r.Body).Decode(user)
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		http.Error(w, "Error in the request.", http.StatusBadRequest)
 		return
@@ -23,7 +24,6 @@ func (rt *_router) getLogin(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	b, err := rt.db.CheckIfExist(user.Username)
-
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Don't really know if the user exist")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -52,5 +52,20 @@ func (rt *_router) getLogin(w http.ResponseWriter, r *http.Request, ps httproute
 			return
 		}
 		w.WriteHeader(http.StatusOK)
+	}
+
+	//struct to create the token
+	type Authorization struct {
+		User  User
+		Token int
+	}
+
+	auth := Authorization{user, user.UserID}
+
+	w.Header().Set("content-type", "application/json")
+	if err := json.NewEncoder(w).Encode(auth); err != nil {
+		ctx.Logger.WithError(err).Error("no encoding for the response")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }

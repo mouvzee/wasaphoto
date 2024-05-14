@@ -2,7 +2,7 @@ package database
 
 var AddPhoto = `INSERT Photo(PhotoID, UserID, Caption) WITH VALUES (?,?,?)`
 
-func (db *appdbimpl) Post_Photo(y Photo, ImageData []byte) error {
+func (db *appdbimpl) uploadPhoto(y Photo, ImageData []byte) error {
 	_, err := db.c.Exec(AddPhoto, y.PhotoID, y.User.UserID, y.Caption)
 	return err
 }

@@ -46,15 +46,15 @@ type AppDatabase interface {
 	//get user by ID
 	Get_user_byID(UserID int) (User, error)
 	//set the username of the user
-	Set_username(username string) error
+	SetUsername(username string) error
 	//Post a photo in the user profile
-	Post_Photo(y Photo, ImageData []byte) error
+	uploadPhoto(y Photo, ImageData []byte) error
 	//Delete a photo in the user profile
 	Delete_Photo(UserID int, PhotoID int) error
 	//check if the username is already token
 	CheckIfExist(Username string) (bool, error)
-	//compare token and userID to know if the user is authorized
-	IsAuthorized(UserID int) (bool, error)
+	//Change the username with a new one
+	ChangeUsername(userID int, newUsername string) error
 	Ping() error
 }
 
@@ -69,60 +69,37 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
-
+	var err error
 	// Check if tables exists. If not, the database is empty, and we need to create the structure and the tables
-	var user_table string
-	err := db.QueryRow(`SELECT user_table FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&user_table)
-	if errors.Is(err, sql.ErrNoRows) {
-		_, err = db.Exec(user_table)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+
+	_, err = db.Exec(user_table)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
-	var post_table string
-	err = db.QueryRow(`SELECT post_table FROM sqlite_master WHERE type='table' AND name='post_table';`).Scan(&post_table)
-	if errors.Is(err, sql.ErrNoRows) {
-		_, err = db.Exec(post_table)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+	_, err = db.Exec(post_table)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
-	var like_table string
-	err = db.QueryRow(`SELECT like_table FROM sqlite_master WHERE type='table' AND name='like_table';`).Scan(&like_table)
-	if errors.Is(err, sql.ErrNoRows) {
-		_, err = db.Exec(like_table)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+	_, err = db.Exec(like_table)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
-	var comment_table string
-	err = db.QueryRow(`SELECT comment_table FROM sqlite_master WHERE type='table' AND name='comment_table';`).Scan(&comment_table)
-	if errors.Is(err, sql.ErrNoRows) {
-		_, err = db.Exec(comment_table)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+	_, err = db.Exec(comment_table)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
-	var follow_table string
-	err = db.QueryRow(`SELECT follow_table FROM sqlite_master WHERE type='table' AND name='follow_table';`).Scan(&follow_table)
-	if errors.Is(err, sql.ErrNoRows) {
-		_, err = db.Exec(follow_table)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+	_, err = db.Exec(follow_table)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
-	var ban_table string
-	err = db.QueryRow(`SELECT ban_table FROM sqlite_master WHERE type='table' AND name='ban_table';`).Scan(&ban_table)
-	if errors.Is(err, sql.ErrNoRows) {
-		_, err = db.Exec(ban_table)
-		if err != nil {
-			return nil, fmt.Errorf("error creating database structure: %w", err)
-		}
+	_, err = db.Exec(ban_table)
+	if err != nil {
+		return nil, fmt.Errorf("error creating database structure: %w", err)
 	}
 
 	return &appdbimpl{

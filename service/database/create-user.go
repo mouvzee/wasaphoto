@@ -2,49 +2,51 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 )
 
-var authUser = `INSERT INTO Authorization (User, token) VALUES (?,?)`
 var adduser = `INSERT INTO User (userID, username) VALUES (?,?);`
-var findID = `SELECT userID FROM User`
+var findID = `SELECT MAX(userID) FROM User`
 
 func (db *appdbimpl) CreateUser(x User) (User, error) {
 	var user User
 	user.Username = x.Username
 
 	//userID
-	var id = sql.NullInt64{Int64: 0, Valid: false}
+	var _id = sql.NullInt64{Int64: 0, Valid: false}
 	y, err := db.c.Query(findID)
 	if err != nil {
 		return user, err
 	}
 
 	//prepare a list of row to check the ids
+	var id int
 	for y.Next() {
 		if y.Err() != nil {
 			return user, err
 		}
-		//check if ID is valid
-		if !id.Valid {
-			fmt.Println("Invalid ID, ID must be NOT NULL and a positive integer")
+
+		err = y.Scan(&_id)
+		if err != nil && !errors.Is(err, sql.ErrNoRows) {
 			return user, err
+		}
+
+		//check if ID is valid
+		if !_id.Valid {
+			id = 0
+		} else {
+			id = int(_id.Int64)
 		}
 	}
 
+	// set the userID
+	user.UserID = id + 1
+
 	//create a folder for the user with userID in the path
 	p := "./users-data/" + fmt.Sprint(user.UserID) + "/pubblications"
-	err = os.MkdirAll(p, os.ModePerm)
-	if err != nil {
-		return user, err
-	}
-	//create a unique token for the user
-	var a Authorization
-	a.User = user
-	a.Token = user.UserID
-	_, err = db.c.Exec(authUser, a.User, a.Token)
-	if err != nil {
+	if err = os.MkdirAll(p, os.ModePerm); err != nil {
 		return user, err
 	}
 
