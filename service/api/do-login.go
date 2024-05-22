@@ -39,7 +39,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		}
 		w.WriteHeader(http.StatusCreated)
 	} else {
-		dbUser, err := rt.db.Get_User_ByUsername(user.Username)
+		dbUser, err := rt.db.GetUserByUsername(user.Username)
 		if err != nil {
 			ctx.Logger.WithError(err).Error("Cannot find the user")
 			w.WriteHeader(http.StatusInternalServerError)

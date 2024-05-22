@@ -18,6 +18,14 @@ content-Type: application/json
 Authorization: 1
 
 {
-    "username" : "puzzola"
+    "username" : "mouvzee"
 }
 ####
+
+POST http://localhost:3000/photo/1/user/1 HTTP/1.1
+Content-Type: application/json
+Authorization: 1
+
+{
+    
+}

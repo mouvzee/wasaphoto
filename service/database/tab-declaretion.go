@@ -11,6 +11,7 @@ var post_table = `CREATE TABLE IF NOT EXISTS Post
 				(
 					postID INTEGER NOT NULL,
 					userID INTEGER NOT NULL,
+					caption TEXT,
 					created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 					PRIMARY KEY(postID, userID),
 					CONSTRAINT fk_post

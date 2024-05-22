@@ -39,22 +39,47 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
+
+	//USER
+
 	//Create user in the database
 	CreateUser(u User) (User, error)
 	//search an user by username
-	Get_User_ByUsername(username string) (User, error)
+	GetUserByUsername(username string) (User, error)
 	//get user by ID
-	Get_user_byID(UserID int) (User, error)
+	GetUserbyID(UserID int) (User, error)
 	//set the username of the user
 	SetUsername(username string) error
-	//Post a photo in the user profile
-	uploadPhoto(y Photo, ImageData []byte) error
-	//Delete a photo in the user profile
-	Delete_Photo(UserID int, PhotoID int) error
 	//check if the username is already token
 	CheckIfExist(Username string) (bool, error)
-	//Change the username with a new one
+	//change the username with a new one
 	ChangeUsername(userID int, newUsername string) error
+
+	//PHOTO
+
+	//Create post in the database
+	CreatePhoto(y Photo, ImageData []byte) (Photo, error)
+	//Get the ID of the last photo uploaded
+	GetLastPhotoID(userID int) (int, error)
+	//Delete a photo in the user profile
+	Delete_Photo(UserID int, PhotoID int) error
+
+	//COMMENT
+	CreateComment(commentID, creatorID, PhotoID int) error
+
+	//LIKE
+	CreateLike(userID int, creatorID int, postID int) error
+	
+	//FOLLOW
+	CreateFollow(followerID, followedID int) error
+
+	//BAN
+	CreateBan(bannerID, bannedID int) error
+
+	
+	//PROFILE
+	//visualize the profile of the user
+
 	Ping() error
 }
 
