@@ -9,6 +9,7 @@ import (
 
 type Comment struct {
 	CommentID  int
+	photoID    int
 	User       User
 	Lyric      string
 	Created_At time.Time
@@ -23,6 +24,7 @@ func (c *Comment) takingComment(dbComment database.Comment) error {
 	}
 
 	c.CommentID = dbComment.CommentID
+	c.photoID = dbComment.PhotoID
 	c.Lyric = dbComment.Lyric
 	c.User = User(dbComment.User)
 	c.Created_At = dbComment.Created_At

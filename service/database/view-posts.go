@@ -2,7 +2,7 @@ package database
 
 var getPostsQUERY = `SELECT postID, userID, caption, timestamp FROM Post WHERE userID=? ORDER BY timestamp DESC LIMIT ?, ?`
 var getlikeQUERY = `SELECT COUNT(postID) FROM Like WHERE postID=? AND userID=?`
-var getCommentsQUERY = `SELECT COUNT(postID) FROM Comment WHERE postID=? AND userID=?`
+var getCommentQUERY = `SELECT COUNT(postID) FROM Comment WHERE postID=? AND userID=?`
 var statusPhotoQUERY = `SELECT COUNT(PhotoID) FROM Like WHERE userID=? AND postID=? AND creatorID=?`
 
 func (db *appdbimpl) ViewPosts(userID, offset, limit int) ([]Photo, error) {
@@ -34,7 +34,7 @@ func (db *appdbimpl) ViewPosts(userID, offset, limit int) ([]Photo, error) {
 		}
 
 		//number of comments
-		err = db.c.QueryRow(getCommentsQUERY, photo.PhotoID, userID).Scan(&photo.Ncomment)
+		err = db.c.QueryRow(getCommentQUERY, photo.PhotoID, userID).Scan(&photo.Ncomment)
 		if err != nil {
 			return nil, err
 		}
@@ -52,7 +52,7 @@ func (db *appdbimpl) ViewPosts(userID, offset, limit int) ([]Photo, error) {
 		}
 
 		//find the owner information
-		user, err := db.GetUserbyID(userID)
+		user, err := db.GetUsernamebyID(userID)
 		if err != nil {
 			return nil, err
 		}

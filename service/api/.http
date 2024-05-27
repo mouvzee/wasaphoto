@@ -5,6 +5,8 @@ content-type: application/json
     "username": "mouvzee"
 }
 ####
+
+    //DO LOGIN
 POST http://localhost:3000/login HTTP/1.1
 content-type: application/json
 
@@ -12,20 +14,28 @@ content-type: application/json
     "username": "cizzo"
 }
 ####
-
+    //CHANGE USERNAME//
 PUT http://localhost:3000/user/1/username HTTP/1.1
 content-Type: application/json
 Authorization: 1
 
 {
-    "username" : "mouvzee"
+    "username" : "maumau"
 }
 ####
 
 POST http://localhost:3000/photo/1/user/1 HTTP/1.1
-Content-Type: application/json
 Authorization: 1
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
-{
-    
-}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="caption"
+
+ciao
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="image.jpeg"
+Content-Type: image/jpeg
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###

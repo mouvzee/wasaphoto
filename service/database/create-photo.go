@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-var CreatePhotoQUERY = `INSERT Photo(PhotoID, UserID, Caption) WITH VALUES (?,?,?)`
+var CreatePhotoQUERY = `INSERT Post(postID, userID, caption) WITH VALUES (?,?,?)`
 
 func (db *appdbimpl) CreatePhoto(y Photo, ImageData []byte) (Photo, error) {
 	_photoID, err := db.GetLastPhotoID(y.User.UserID)
@@ -25,7 +25,7 @@ func (db *appdbimpl) CreatePhoto(y Photo, ImageData []byte) (Photo, error) {
 		err = transition.Commit()
 	}()
 
-	y.PhotoID = _photoID
+	y.PhotoID = _photoID + 1
 	userID := y.User.UserID
 	URL := GetPhotoPath(y.PhotoID, userID)
 

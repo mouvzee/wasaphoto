@@ -38,6 +38,7 @@ var comment_table = `CREATE TABLE IF NOT EXISTS Comment
 					textComment TEXT NOT NULL,
 					postID INTEGER NOT NULL,
 					creatorID INTEGER NOT NULL,
+					hidden BOOLEAN DEFAULT FALSE,
 					created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 					PRIMARY KEY(commentID, creatorID, postID),
 					CONSTRAINT fk_comment

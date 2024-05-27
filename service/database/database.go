@@ -44,16 +44,20 @@ type AppDatabase interface {
 
 	//Create user in the database
 	CreateUser(u User) (User, error)
+	//check if the userID exist and return the user, error otherwise
+	CheckID(userID int) (User, error)
 	//search an user by username
 	GetUserByUsername(username string) (User, error)
 	//get user by ID
-	GetUserbyID(UserID int) (User, error)
+	GetUsernamebyID(UserID int) (User, error)
 	//set the username of the user
 	SetUsername(username string) error
 	//check if the username is already token
-	CheckIfExist(Username string) (bool, error)
+	CheckUsername(Username string) (bool, error)
 	//change the username with a new one
 	ChangeUsername(userID int, newUsername string) error
+	//delete the user and his posts from the database
+	DeleteUser(userID int) error
 
 	//PHOTO
 
@@ -65,18 +69,39 @@ type AppDatabase interface {
 	Delete_Photo(UserID int, PhotoID int) error
 
 	//COMMENT
+
+	//create a comment in the database
 	CreateComment(commentID, creatorID, PhotoID int) error
+	//delete a comment in the database
+	DeleteComment(commentID, creatorID, photoID int) error
 
 	//LIKE
+
+	//create a like in the database
 	CreateLike(userID int, creatorID int, postID int) error
-	
+	//delete a like in the database
+	DeleteLike(userID, creatorID, postID int) error
+
 	//FOLLOW
+
+	//create a follow in the database
 	CreateFollow(followerID, followedID int) error
+	//get the followers of a user and return them
+	GetFollowers(followedID int, offset int, limit int) ([]User, error)
+	//get the following of a user and return them
+	GetFollowings(followerID int, offset int, limit int) ([]User, error)
+	//delete a follow in the database
+	DeleteFollow(followerID, followedID int) error
 
 	//BAN
-	CreateBan(bannerID, bannedID int) error
 
-	
+	//create a ban in the database
+	CreateBan(bannerID, bannedID int) error
+	//get all the banned users from te current user
+	GetBan(bannerID, offset, limit int) ([]User, error)
+	//delete te ban between two users in the database
+	DeleteBan(bannerID, bannedID int) error
+
 	//PROFILE
 	//visualize the profile of the user
 

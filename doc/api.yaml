@@ -15,13 +15,15 @@ components:
   schemas:
     User:
       type: object
+      description: "Represents a user in the system"
       properties:
         userid:
           type: integer
+          description: "User unique identifier"
         username:
           type: string
-          #minLenght: 3
-          #maxLenght: 16
+          minLength: 3
+          maxLength: 16
     Photo:
       type: object
       properties:
@@ -155,20 +157,26 @@ paths:
       tags: ["photo"]
       summary: Carica nuova foto
       operationId: uploadPhoto
-      description: Consente il caricamento di una foto nel feed
+      description: Let the user upload a photo on his feed
       security:
         - controllo: []
       requestBody: 
         required: true
         content:
-          application/json:
+          multipart/form-data:
               schema:
-                $ref: '#/components/schemas/Photo'
+                description: Need the photo to upload and the caption
+                type: object
+                properties:
+                  caption: {$ref: '#/components/schemas/Photo/properties/caption'}
+                  file:
+                    type: string
+                    format: byte
       responses:
         '400':
-          description: Errore nei dati della richiesta
+          description: Error in the request data
         '200':
-          description: Immagine correttamente caricata
+          description: Image uploaded successfully!
 
   /user/followings:
     post:

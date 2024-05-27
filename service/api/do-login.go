@@ -23,7 +23,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	b, err := rt.db.CheckIfExist(user.Username)
+	b, err := rt.db.CheckUsername(user.Username)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Don't really know if the user exist")
 		w.WriteHeader(http.StatusInternalServerError)

@@ -23,6 +23,7 @@ type Photo struct {
 
 type Comment struct {
 	CommentID  int       `json:"commentID"`
+	PhotoID    int       `json:"photoID"`
 	User       User      `json:"user"`
 	Lyric      string    `json:"lyric"`
 	Created_At time.Time `json:"createdAt"`

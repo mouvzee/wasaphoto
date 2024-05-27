@@ -35,9 +35,10 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	caption := r.FormValue("caption")
 
 	// Get the file from the form
-	file, _, err := r.FormFile("")
+	file, _, err := r.FormFile("image")
+	print(file)
 	if err != nil {
-		http.Error(w, "Bad Request "+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Bad Request --> "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -49,7 +50,9 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 	// check if the user is uploading an image/jpeg
+	println(data)
 	fileType := http.DetectContentType(data)
+	println(fileType)
 	if fileType != "image/jpeg" {
 		http.Error(w, "Bad Request wrong file type", http.StatusBadRequest)
 		return
@@ -57,8 +60,8 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	defer func() { err = file.Close() }()
 
-	//get the user by the ID 
-	dbUser, err := rt.db.GetUserbyID(userID)
+	//get the user by the ID
+	dbUser, err := rt.db.GetUsernamebyID(userID)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("error getting user")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -74,12 +77,12 @@ func (rt *_router) UploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	var new = Photo{
-		User: u,
+		User:    u,
 		Caption: caption,
 	}
 
 	//check if the caption is valid
-	if !new.isValid(){
+	if !new.isValid() {
 		http.Error(w, "Invalid Caption", http.StatusBadRequest)
 		return
 	}
