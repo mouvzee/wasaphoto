@@ -29,7 +29,8 @@ components:
       properties:
         photoID:
           type: integer
-        user: { $ref: "#/components/schemas/User"}
+        user:
+          $ref: "#/components/schemas/User"
         URL: 
           type: string
         imageData:
