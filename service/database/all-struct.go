@@ -34,6 +34,7 @@ type Profile struct {
 	Name       string `json:"name"`
 	Follower   int    `json:"follower"`
 	Following  int    `json:"following"`
+	PostsCount int    `json:"postsCount"`
 	IsFollowed bool   `json:"isFollowed"`
 }
 
