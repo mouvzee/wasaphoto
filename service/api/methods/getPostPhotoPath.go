@@ -4,6 +4,6 @@ import (
 	"fmt"
 )
 
-func GetPostPhotoPath(ownerID int, postID int) string {
-	return fmt.Sprintf("./storage/%d/posts/%d.jpeg", ownerID, postID)
+func GetPostPhotoPath(ownerID int, PhotoID int) string {
+	return fmt.Sprintf("./storage/%d/posts/%d.jpeg", ownerID, PhotoID)
 }

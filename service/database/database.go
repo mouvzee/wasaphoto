@@ -58,6 +58,10 @@ type AppDatabase interface {
 	ChangeUsername(userID int, newUsername string) error
 	//delete the user and his posts from the database
 	DeleteUser(userID int) error
+	//get the stream
+	GetStream(userID int, offset int, limit int) ([]Photo, error)
+	//update the caption
+	UpdateCaption(userID int, photoID int, newCaption string) error
 
 	//PHOTO
 
@@ -67,20 +71,25 @@ type AppDatabase interface {
 	GetLastPhotoID(userID int) (int, error)
 	//Delete a photo in the user profile
 	Delete_Photo(UserID int, PhotoID int) error
+	//get the photos
+	GetPosts(userID int, profileUserID int, offset int, limit int) ([]Photo, error)
 
 	//COMMENT
 
 	//create a comment in the database
-	CreateComment(commentID, creatorID, PhotoID int) error
+	CreateComment(userID, ownerID, photoID int, commentText string) (Comment, error)
 	//delete a comment in the database
 	DeleteComment(commentID, creatorID, photoID int) error
-
+	//get the comments of a post
+	GetComments(photoID, creatorID, offset, limit int) ([]Comment, error)
 	//LIKE
 
 	//create a like in the database
-	CreateLike(userID int, creatorID int, postID int) error
+	CreateLike(userID int, creatorID int, PhotoID int) error
 	//delete a like in the database
-	DeleteLike(userID, creatorID, postID int) error
+	DeleteLike(userID, creatorID, PhotoID int) error
+	//get the likes of a post
+	GetLike(PhotoID, creatorID, offset, limit int) ([]User, error)
 
 	//FOLLOW
 
@@ -92,6 +101,8 @@ type AppDatabase interface {
 	GetFollowings(followerID int, offset int, limit int) ([]User, error)
 	//delete a follow in the database
 	DeleteFollow(followerID, followedID int) error
+	//return true if the user is following the other user
+	IsFollowing(followerID, followedID int) (bool, error)
 
 	//BAN
 
@@ -101,10 +112,18 @@ type AppDatabase interface {
 	GetBan(bannerID, offset, limit int) ([]User, error)
 	//delete te ban between two users in the database
 	DeleteBan(bannerID, bannedID int) error
+	//Return true if the user is banned by the banner
+	IsBanned(bannedID, bannerID int) (bool, error)
 
 	//PROFILE
 	//visualize the profile of the user
+	GetUserProfile(profileUserID int, userID int) (Profile, error)
+	//return ture if the username already exist
+	ExistsName(username string) (bool, error)
 
+	SearchUsers(userID int, search string, offset int, limit int) ([]User, error)
+
+	//ping the database if its still working
 	Ping() error
 }
 

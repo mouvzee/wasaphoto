@@ -1,6 +1,6 @@
 package database
 
-var deleteCommentQUERY = "DELETE FROM Comment WHERE commentID=? AND creatorID=? AND postID=?"
+var deleteCommentQUERY = "DELETE FROM Comment WHERE commentID=? AND creatorID=? AND PhotoID=?"
 
 func (db *appdbimpl) DeleteComment(commentID, creatorID, photoID int) error {
 	_, err := db.c.Exec(deleteCommentQUERY, commentID, creatorID, photoID)

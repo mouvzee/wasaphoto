@@ -1,6 +1,6 @@
 package database
 
-var getLikeQUERY = "SELECT userID FROM Like WHERE postID=? AND creatorID=? LIMIT ?,?"
+var getLikeQUERY = "SELECT userID FROM Like WHERE PhotoID=? AND creatorID=? LIMIT ?,?"
 
 func (db *appdbimpl) GetLike(PhotoID, creatorID, offset, limit int) ([]User, error) {
 	var l []User

@@ -3,7 +3,7 @@ package database
 import "database/sql"
 
 var deleteBanQUERY = "DELETE FROM Ban WHERE bannerID=? AND bannedID=?"
-var visualizeCommentsQUERY = "UPDATE Comment SET hidden = FALSE WHERE userID = ? AND postID = ?"
+var visualizeCommentsQUERY = "UPDATE Comment SET hidden = FALSE WHERE userID = ? AND PhotoID = ?"
 
 func (db *appdbimpl) DeleteBan(bannerID, bannedID int) error {
 

@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-var CreatePhotoQUERY = `INSERT Post(postID, userID, caption) WITH VALUES (?,?,?)`
+var CreatePhotoQUERY = `INSERT Post(PhotoID, userID, caption) WITH VALUES (?,?,?)`
 
 func (db *appdbimpl) CreatePhoto(y Photo, ImageData []byte) (Photo, error) {
 	_photoID, err := db.GetLastPhotoID(y.User.UserID)

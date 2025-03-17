@@ -9,7 +9,7 @@ import (
 )
 
 /*
-deletePhoto is the hanlder for the DELETE /users/:profileUserID/posts/:postID endpoint.
+deletePhoto is the hanlder for the DELETE /users/:profileUserID/posts/:PhotoID endpoint.
 It deletes a photo from the database and returns a 200 OK if the photo is deleted.
 */
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
@@ -21,7 +21,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Get the post ID from the URL
-	PhotoID, err := strconv.Atoi(ps.ByName("PostID"))
+	PhotoID, err := strconv.Atoi(ps.ByName("PhotoID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return

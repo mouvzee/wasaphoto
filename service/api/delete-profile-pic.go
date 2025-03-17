@@ -1,0 +1,71 @@
+package api
+
+import (
+	"io"
+	"net/http"
+	"os"
+	"strconv"
+
+	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
+	"github.com/mouvzee/wasaphoto/service/api/methods"
+	"github.com/julienschmidt/httprouter"
+)
+
+/*
+resetMyProfilePic is the handler for the PUT /users/:profileUserID/reset-profile-pic endpoint.
+It reset the profile pic to default of the user with the given ID.
+*/
+func (rt *_router) resetMyProfilePic(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	// Get the user ID from the URL
+	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
+	if err != nil {
+		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	userID := ctx.UserID
+
+	// Check if the user is authorized
+	if profileUserID != userID {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	dbUser, err := rt.db.GetUsernamebyID(userID)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error while getting the user")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	var user User
+	err = user.TakeUser(dbUser)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error while converting the user")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	source, err := os.Open("./storage/default_propic.jpg")
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error while opening the default profile pic")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	defer source.Close()
+
+	destination, err := os.Create(methods.GetProfilePicPath(user.UserID))
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error while creating the profile pic")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	defer destination.Close()
+
+	_, err = io.Copy(destination, source)
+	if err != nil {
+		ctx.Logger.WithError(err).Error("Error while copying the default profile pic")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+}

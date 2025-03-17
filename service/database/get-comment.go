@@ -1,6 +1,6 @@
 package database
 
-var getCommentsQUERY = `SELECT commentID, userID, creatorID, postID, textComment, created_at FROM Comment WHERE creatorID = ? AND postID = ? AND hidden="0" LIMIT ?,?`
+var getCommentsQUERY = `SELECT commentID, userID, creatorID, PhotoID, textComment, created_at FROM Comment WHERE creatorID = ? AND PhotoID = ? AND hidden="0" LIMIT ?,?`
 
 func (db *appdbimpl) GetComments(creatorID int, photoID int, offset int, limit int) ([]Comment, error) {
 	var c []Comment

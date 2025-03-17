@@ -1,9 +1,9 @@
 package database
 
-var getPostsQUERY = `SELECT postID, userID, caption, timestamp FROM Post WHERE userID=? ORDER BY timestamp DESC LIMIT ?, ?`
-var getlikeQUERY = `SELECT COUNT(postID) FROM Like WHERE postID=? AND userID=?`
-var getCommentQUERY = `SELECT COUNT(postID) FROM Comment WHERE postID=? AND userID=?`
-var statusPhotoQUERY = `SELECT COUNT(PhotoID) FROM Like WHERE userID=? AND postID=? AND creatorID=?`
+var getPostsQUERY = `SELECT PhotoID, userID, caption, timestamp FROM Post WHERE userID=? ORDER BY timestamp DESC LIMIT ?, ?`
+var getlikeQUERY = `SELECT COUNT(PhotoID) FROM Like WHERE PhotoID=? AND userID=?`
+var getCommentQUERY = `SELECT COUNT(PhotoID) FROM Comment WHERE PhotoID=? AND userID=?`
+var statusPhotoQUERY = `SELECT COUNT(PhotoID) FROM Like WHERE userID=? AND PhotoID=? AND creatorID=?`
 
 func (db *appdbimpl) ViewPosts(userID, offset, limit int) ([]Photo, error) {
 	lines, err := db.c.Query(getPostsQUERY, userID, offset, limit)

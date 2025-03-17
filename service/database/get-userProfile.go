@@ -3,7 +3,7 @@ package database
 var query_GETUSERINFO = `SELECT userID, username, bio FROM User WHERE userID=?;`
 var query_GETCOUNTFOLLOWINGS = `SELECT count(followedID) FROM Follow WHERE followerID=?;`
 var query_GETCOUNTFOLLOWERS = `SELECT count(followerID) FROM Follow WHERE followedID=?;`
-var query_GETCOUNTPOSTS = `SELECT count(postID) FROM Post WHERE userID=?;`
+var query_GETCOUNTPOSTS = `SELECT count(PhotoID) FROM Post WHERE userID=?;`
 var query_ISFOLLOWED = `SELECT count(followedID) FROM Follow WHERE followedID=? AND followerID=?;`
 
 func (db *appdbimpl) GetUserProfile(profileUserID int, userID int) (Profile, error) {

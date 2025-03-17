@@ -2,13 +2,12 @@ package database
 
 import (
 	"github.com/mouvzee/wasaphoto/service/api/methods"
-
 )
 
-var query_GETPOSTS = `SELECT postID, userID, caption, timestamp FROM Post WHERE userID=? ORDER BY timestamp DESC LIMIT ?, ?`
-var query_GETLIKECOUNT = `SELECT COUNT(postID) FROM Like WHERE postID=? AND ownerID=?`
-var query_GETCOMMENTCOUNT = `SELECT COUNT(postID) FROM Comment WHERE postID=? AND ownerID=?`
-var query_ISLIKED = `SELECT COUNT(postID) FROM Like WHERE postID=? AND ownerID=? AND userID=?`
+var query_GETPOSTS = `SELECT PhotoID, userID, caption, timestamp FROM Post WHERE userID=? ORDER BY timestamp DESC LIMIT ?, ?`
+var query_GETLIKECOUNT = `SELECT COUNT(PhotoID) FROM Like WHERE PhotoID=? AND ownerID=?`
+var query_GETCOMMENTCOUNT = `SELECT COUNT(PhotoID) FROM Comment WHERE PhotoID=? AND ownerID=?`
+var query_ISLIKED = `SELECT COUNT(PhotoID) FROM Like WHERE PhotoID=? AND ownerID=? AND userID=?`
 
 func (db *appdbimpl) GetPosts(userID int, profileUserID int, offset int, limit int) ([]Photo, error) {
 	// Get the posts from the database

@@ -9,34 +9,43 @@ import (
 	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
 
+/*
+setMyUsername is the handler for the API endpoint PUT /profiles/:profileUserID/username.
+It change the username of the user with the given userID to the new username.
+The new username must be in the body of the request.
+The request body must be a JSON object with the following fields:
+- username: string
+*/
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the userID from the URL
-	UserID, err := strconv.Atoi(ps.ByName("userID"))
+	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	userID := ctx.UserID
+
 	// Check if the user is authorized
-	if UserID != ctx.UserID {
+	if profileUserID != userID {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
-	var u User
-	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+	var user User
+
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	//check if user is valid
-	if !u.isValid() {
+	if !user.isValid() {
 		http.Error(w, "Invalid username", http.StatusBadRequest)
 		return
 	}
 
 	// Change the username, if the new username is already taken, the request will fail
-	if err := rt.db.ChangeUsername(UserID, u.Username); err != nil {
+	if err := rt.db.ChangeUsername(userID, user.Username); err != nil {
 		http.Error(w, "Username already taken. Username must be unique", http.StatusBadRequest)
 		return
 	}
@@ -45,9 +54,8 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("content-type", "plain/text")
 	if err := json.NewEncoder(w).Encode("Username changed"); err != nil {
-		ctx.Logger.WithError(err).Error("Response not encoted")
+		ctx.Logger.WithError(err).Error("can't encode the response")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
 }

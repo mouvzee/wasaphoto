@@ -1,6 +1,6 @@
 package database
 
-var join_FOLLOWINGS_POSTS = `SELECT User.userID, User.username, Post.postID, Post.caption, Post.timestamp 
+var join_FOLLOWINGS_POSTS = `SELECT User.userID, User.username, Post.PhotoID, Post.caption, Post.timestamp 
 							FROM (` + union_FOLLOWINGS_ME + `) AS User INNER JOIN Post ON User.userID = Post.userID ORDER BY Post.timestamp DESC LIMIT ?, ?`
 var union_FOLLOWINGS_ME = getFollowingsQUERY + ` UNION SELECT userID, username FROM User WHERE userID=?`
 

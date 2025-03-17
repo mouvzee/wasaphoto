@@ -52,7 +52,7 @@ components:
       properties:
         commentID: 
           type: integer
-        user: { $ref: "#/components/schemas/User"}
+        user: { $ref: "#/components/schemas/User" }
         lyric:
           type: string
         createdAt:
@@ -61,7 +61,7 @@ components:
     Profile:
       type: object
       properties:
-        user: { $ref: "#/components/schemas/User"}
+        user: { $ref: "#/components/schemas/User" }
         name:
           type: string
         follower:
@@ -76,7 +76,7 @@ components:
         user: {$ref: "#/components/schemas/User"}
         token: 
           type: integer
-
+    
 
 
 
@@ -97,7 +97,7 @@ paths:
             schema:
               type: object
               properties:
-                username: { $ref: "#/components/schemas/User/properties/username"}
+                username: { $ref: "#/components/schemas/User/properties/username" }
               example:
                 username: "example_user"
       responses:
@@ -105,12 +105,12 @@ paths:
           description: User created successfully
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Authorization"}
+              schema: { $ref: "#/components/schemas/Authorization" }
         '200':
           description: User logged in successfully
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Authorization"}
+              schema: { $ref: "#/components/schemas/Authorization" }
         '400':
           description: Bad request. Invalid input data.
         '500':
