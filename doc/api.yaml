@@ -5,109 +5,180 @@ info:
     Versione 1 del progetto WASA.
   version: "1"
 tags:
-  - name: doLogin
-    description: Login and user authentication
-  - name: setMyUsername
-    description: Set and change username
-  - name: uploadPhoto
-    description: Upload photos
-  - name: deletePhoto
-    description: Delete photos
-  - name: followUser
-    description: Follow users
-  - name: unfollowUser
-    description: Unfollow users
-  - name: banUser
-    description: Ban users
-  - name: unbanUser
-    description: Unban users
-  - name: likePhoto
-    description: Like photos
-  - name: unlikePhoto
-    description: Unlike photos
-  - name: commentPhoto
-    description: Comment on photos
-  - name: uncommentPhoto
-    description: Delete comments
-  - name: getUserProfile
-    description: Get user profile
-  - name: getMyStream
-    description: Get user stream
+  - name: Login
+    description: Everything about login
+  - name: Username
+    description: Everything about username
+  - name: Photo
+    description: Everything about photos
+  - name: User Profile
+    description: Everything about user profiles
+  - name: Stream
+    description: Everything about the stream
 components:
   schemas:
-    Username:
-      type: object
-      properties:
-        username:
-          type: string
+    userID:
+      title: User id 
+      description: The numeric user id
+      type: integer
+      example: 100
+      minimum: 1 
+    username:
+      title: Username
+      description: The username of the user
+      type: string
+      pattern: "^[a-z0-9]{3,13}$"
+      example: "john123"
+      minLength: 3
+      maxLength: 13
+    imageData:
+      title: Image
+      description: The base 64 image data
+      type: string
+      format: byte
+      minLength: 0
+      maxLength: 1000000000
+    photoID:
+      title: Photo id
+      description: The numeric photo id
+      type: integer
+      example: 100
+      minimum: 1
+    commentID:
+      title: Comment id
+      description: The numeric comment id
+      type: integer
+      example: 100
+      minimum: 1
+    caption:
+      title: Caption
+      description: The caption of the photo
+      type: string
+      pattern: '^[^\/\\]{0,64}$'
+      example: "This is a caption"
+      minLength: 0
+      maxLength: 64
+    createdAt:
+      title: Timestamp
+      description: The timestamp of the post.
+      type: string
+      format: date-time
+      pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$"
+      example: "2020-12-31T23:59:59"
+      minLength: 19
+      maxLength: 19
+    Auth:
+      title: Auth
+      description: The authorization code is the user_id.
+      type: integer
+      example: 10
+      minimum: 1
     User:
+      title: User
+      description: The user object
       type: object
       properties:
-        userID:
-          type: integer
-        username:
-          type: string
-    Photo:
-      type: object
-      properties:
-        photoID:
-          type: integer
-        user:
-          $ref: '#/components/schemas/User'
-        URL:
-          type: string
-        imageData:
-          type: string
-          format: byte
-        caption:
-          type: string
-        nlike:
-          type: integer
-        ncomment:
-          type: integer
-        liked:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-    Comment:
-      type: object
-      properties:
-        commentID:
-          type: integer
-        ownerID:
-          type: integer
-        photoID:
-          type: integer
-        user:
-          $ref: '#/components/schemas/User'
-        lyric:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
+        userID: { $ref: '#/components/schemas/userID' }
+        username: { $ref: '#/components/schemas/username' }
+        profilePicture: { $ref: '#/components/schemas/imageData' }
     Profile:
+      title: Profile
+      description: The profile of the user
       type: object
       properties:
-        user:
-          $ref: '#/components/schemas/User'
-        name:
-          type: string
+        user: { $ref: '#/components/schemas/User' }
+        name: { type: string }
         follower:
           type: integer
+          description: The number of followers
+          example: 100
+          minimum: 0
         following:
           type: integer
+          description: The number of following users
+          example: 100
+          minimum: 0
         postsCount:
           type: integer
+          description: The number of posts
+          example: 100
+          minimum: 0
         isFollowed:
           type: boolean
-    Authorization:
+          description: True if the user is followed by the authenticated user
+          example: true
+    Photo:
+      title: Photo
+      description: List of photos
       type: object
       properties:
-        user:
-          $ref: '#/components/schemas/User'
-        token:
+        imageData: { $ref: '#/components/schemas/imageData' }
+        caption: { $ref: '#/components/schemas/caption' }
+        createdAt: { $ref: '#/components/schemas/createdAt' }
+        nlike:
           type: integer
+          description: The number of likes
+          example: 100
+          minimum: 0
+        ncomment:
+          type: integer
+          description: The number of comments
+          example: 100
+          minimum: 0
+        liked:
+          type: boolean
+          description: True if the photo is liked by the authenticated user
+          example: true
+    PhotoList:
+      title: Photo list
+      description: List of photos
+      type: array
+      items: { $ref: '#/components/schemas/Photo' }
+      minItems: 0
+      maxItems: 100
+    UserList:
+      title: User list
+      description: List of users
+      type: array
+      items: 
+        type: object
+        description: user
+        properties:
+          user: { '#/components/schemas/User' }
+          imageData: { $ref: '#/components/schemas/imageData' }
+      minItems: 0
+      maxItems: 100
+    Authorization:
+      title: Authorization
+      description: The authorization is the user id.
+      type: object
+      properties:
+        user: { $ref: '#/components/schemas/User' }
+        token: { $ref: '#/components/schemas/Auth' }
+    Comment:
+      title: Comment
+      description: The comment object of the post
+      type: object
+      properties:
+        commentID: { $ref: '#/components/schemas/commentID' }
+        ownerID: { $ref: '#/components/schemas/userID' }
+        user: { $ref: '#/components/schemas/User' }
+        lyric:
+          type: string
+          description: The comment of the post
+          example: "This is a comment"
+          pattern: '^[^\/\\]{1,64}$'
+          minLength: 1
+          maxLength: 64
+        createdAt: { $ref: '#/components/schemas/createdAt' }
+    CommentList:
+      title: Comment list
+      description: List of all comments on the photo.
+      type: array
+      items: { $ref: '#/components/schemas/Comment' }
+      minItems: 0
+      maxItems: 100
+
   responses:
     # 200 response
     Success:
@@ -123,24 +194,80 @@ components:
     # 201 response
     Created:
       description: Created
+      content:
+        text/plain:
+          schema:
+            description: Created message
+            type: string
+            properties:
+              message:
+                type: string
     # 204 response
     NoContent:
       description: No content
+      content:
+        text/plain:
+          schema:
+            description: No content message
+            type: string
+            properties:
+              message:
+                type: string
     # 400 response
     BadRequest:
       description: Bad request
+      content:
+        text/plain:
+          schema:
+            description: Bad request message
+            type: string
+            properties:
+              message:
+                type: string
     # 401 response
     Unauthorized:
       description: Unauthorized
+      content:
+        text/plain:
+          schema:
+            description: Unauthorized message
+            type: string
+            properties:
+              message:
+                type: string
     # 403 response
     Forbidden:
       description: Forbidden
+      content:
+        text/plain:
+          schema:
+            description: Forbidden message
+            type: string
+            properties:
+              message:
+                type: string
     # 404 response
     NotFound:
       description: Not found
+      content:
+        text/plain:
+          schema:
+            description: Not found message
+            type: string
+            properties:
+              message:
+                type: string
     # 500 response
     InternalServerError:
       description: Internal server error
+      content:
+        text/plain:
+          schema:
+            description: Internal server error message
+            type: string
+            properties:
+              message:
+                type: string
     
 
 paths:
@@ -148,7 +275,7 @@ paths:
     post:
       summary: User login
       tags:
-        - doLogin
+        - Login
       operationId: doLogin
       requestBody:
         description: User credentials
@@ -158,7 +285,7 @@ paths:
               description: username of the user
               type: object
               properties:
-                username: { $ref: '#/components/schemas/Username' }
+                username: { $ref: '#/components/schemas/username' }
         required: true
       responses:
         '200': { $ref: '#/components/responses/Success' }
@@ -167,38 +294,117 @@ paths:
         "500": { $ref: '#/components/responses/InternalServerError' }
 
   /profiles/{profileUserID}:
+    parameters:
+      - name: profileUserID
+        in: path
+        description: profile of the user id you want to see.
+        required: true
+        schema: { $ref: '#/components/schemas/userID' }
+
     get:
       summary: Get user profile
       tags:
         - User Profile
+      operationId: getUserProfile
+      description: Get the profile of the user.
       responses:
         '200':
           description: User profile retrieved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Profile' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalServerError' }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+
     delete:
       summary: Delete user
       tags:
         - User Profile
+      operationId: deleteUser
+      description: Delete the user.
       responses:
-        '204':
+        "200":
           description: User deleted
+          content:
+            application/json:
+              schema: { $ref: '#/components/responses/Success' }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+        "500": { $ref: '#/components/responses/InternalServerError' }
 
   /profiles/{profileUserID}/username:
+    parameters:
+      - name: profileUserID
+        in: path
+        description: profile of the user id you want to change the username.
+        required: true
+        schema: { $ref: '#/components/schemas/userID' }
+
     put:
       summary: Change username
       tags:
         - User Profile
+      operationId: setMyUserName
+      description: Set new username of the user. The new username must be unique.
+      requestBody:
+        description: New username
+        content:
+          application/json:
+            schema:
+              description: username of the user
+              type: object
+              properties:
+                username: { $ref: '#/components/schemas/username' }
+        required: true
       responses:
         '200':
           description: Username updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/responses/Success' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /profiles/{profileUserID}/profile-picture:
+    parameters:
+      - name: profileUserID
+        in: path
+        description: profile of the user id you want to change the profile picture.
+        required: true
+        schema: { $ref: '#/components/schemas/userID' }
+    
     put:
-      summary: Change profile picture
+      summary: Change or Set profile picture
       tags:
         - User Profile
+      operationId: setMyProfilePic
+      description: Set or change the profile picture of the user.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              description: file to upload.
+              properties:
+                imageData: { $ref: '#/components/schemas/imageData' }
       responses:
         '200':
-          description: Profile picture updated
+          description: Profile picture updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                description: URL of the profile picture
+                properties:
+                  schema: { $ref: '#/components/schemas/imageData' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalServerError' }
 
   /profiles/{profileUserID}/reset-profile-picture:
     put:
