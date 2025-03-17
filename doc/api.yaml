@@ -4,55 +4,83 @@ info:
   description: |-
     Versione 1 del progetto WASA.
   version: "1"
-
-security:
-  - controllo: []
+tags:
+  - name: doLogin
+    description: Login and user authentication
+  - name: setMyUsername
+    description: Set and change username
+  - name: uploadPhoto
+    description: Upload photos
+  - name: deletePhoto
+    description: Delete photos
+  - name: followUser
+    description: Follow users
+  - name: unfollowUser
+    description: Unfollow users
+  - name: banUser
+    description: Ban users
+  - name: unbanUser
+    description: Unban users
+  - name: likePhoto
+    description: Like photos
+  - name: unlikePhoto
+    description: Unlike photos
+  - name: commentPhoto
+    description: Comment on photos
+  - name: uncommentPhoto
+    description: Delete comments
+  - name: getUserProfile
+    description: Get user profile
+  - name: getMyStream
+    description: Get user stream
 components:
-  securitySchemes: 
-    controllo:
-      type: http
-      scheme: bearer
   schemas:
-    User:
+    Username:
       type: object
-      description: "Represents a user in the system"
       properties:
-        userid:
-          type: integer
-          description: "User unique identifier"
         username:
           type: string
-          minLength: 3
-          maxLength: 16
+    User:
+      type: object
+      properties:
+        userID:
+          type: integer
+        username:
+          type: string
     Photo:
       type: object
       properties:
         photoID:
           type: integer
         user:
-          $ref: "#/components/schemas/User"
-        URL: 
+          $ref: '#/components/schemas/User'
+        URL:
           type: string
         imageData:
           type: string
-          format: binary
+          format: byte
         caption:
           type: string
         nlike:
           type: integer
         ncomment:
           type: integer
-        liked: 
+        liked:
           type: boolean
         createdAt:
           type: string
           format: date-time
-    comment:
+    Comment:
       type: object
       properties:
-        commentID: 
+        commentID:
           type: integer
-        user: { $ref: "#/components/schemas/User" }
+        ownerID:
+          type: integer
+        photoID:
+          type: integer
+        user:
+          $ref: '#/components/schemas/User'
         lyric:
           type: string
         createdAt:
@@ -61,383 +89,292 @@ components:
     Profile:
       type: object
       properties:
-        user: { $ref: "#/components/schemas/User" }
+        user:
+          $ref: '#/components/schemas/User'
         name:
           type: string
         follower:
           type: integer
-        following: 
+        following:
+          type: integer
+        postsCount:
           type: integer
         isFollowed:
           type: boolean
     Authorization:
       type: object
       properties:
-        user: {$ref: "#/components/schemas/User"}
-        token: 
+        user:
+          $ref: '#/components/schemas/User'
+        token:
           type: integer
+  responses:
+    # 200 response
+    Success:
+      description: Success
+      content:
+        text/plain:
+          schema:
+            description: Success message
+            type: string
+            properties:
+              message:
+                type: string
+    # 201 response
+    Created:
+      description: Created
+    # 204 response
+    NoContent:
+      description: No content
+    # 400 response
+    BadRequest:
+      description: Bad request
+    # 401 response
+    Unauthorized:
+      description: Unauthorized
+    # 403 response
+    Forbidden:
+      description: Forbidden
+    # 404 response
+    NotFound:
+      description: Not found
+    # 500 response
+    InternalServerError:
+      description: Internal server error
     
-
-
 
 paths:
   /login:
     post:
-      tags: 
-        - "login"
-      summary: Log in a user
-      description:
-        Logs in the user. If the user does not exist, it will be created. Otherwise, returns the user ID.
+      summary: User login
+      tags:
+        - doLogin
       operationId: doLogin
       requestBody:
-        description: User details
-        required: true
+        description: User credentials
         content:
           application/json:
             schema:
+              description: username of the user
               type: object
               properties:
-                username: { $ref: "#/components/schemas/User/properties/username" }
-              example:
-                username: "example_user"
+                username: { $ref: '#/components/schemas/Username' }
+        required: true
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        "201": { $ref: '#/components/responses/Created' }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "500": { $ref: '#/components/responses/InternalServerError' }
+
+  /profiles/{profileUserID}:
+    get:
+      summary: Get user profile
+      tags:
+        - User Profile
+      responses:
+        '200':
+          description: User profile retrieved
+    delete:
+      summary: Delete user
+      tags:
+        - User Profile
+      responses:
+        '204':
+          description: User deleted
+
+  /profiles/{profileUserID}/username:
+    put:
+      summary: Change username
+      tags:
+        - User Profile
+      responses:
+        '200':
+          description: Username updated
+
+  /profiles/{profileUserID}/profile-picture:
+    put:
+      summary: Change profile picture
+      tags:
+        - User Profile
+      responses:
+        '200':
+          description: Profile picture updated
+
+  /profiles/{profileUserID}/reset-profile-picture:
+    put:
+      summary: Reset profile picture
+      tags:
+        - User Profile
+      responses:
+        '200':
+          description: Profile picture reset
+
+  /profiles/{profileUserID}/followings/{targetUserID}:
+    put:
+      summary: Follow a user
+      tags:
+        - Social
+      responses:
+        '200':
+          description: User followed
+    delete:
+      summary: Unfollow a user
+      tags:
+        - Social
+      responses:
+        '200':
+          description: User unfollowed
+
+  /profiles/{profileUserID}/followings:
+    get:
+      summary: Get followings
+      tags:
+        - Social
+      responses:
+        '200':
+          description: List of followings retrieved
+
+  /profiles/{profileUserID}/followers:
+    get:
+      summary: Get followers
+      tags:
+        - Social
+      responses:
+        '200':
+          description: List of followers retrieved
+
+  /profiles/{profileUserID}/bans/{targetUserID}:
+    put:
+      summary: Ban a user
+      tags:
+        - Social
+      responses:
+        '200':
+          description: User banned
+    delete:
+      summary: Unban a user
+      tags:
+        - Social
+      responses:
+        '200':
+          description: User unbanned
+
+  /profiles/{profileUserID}/bans:
+    get:
+      summary: Get banned users
+      tags:
+        - Social
+      responses:
+        '200':
+          description: List of banned users retrieved
+
+  /profiles/{profileUserID}/posts:
+    post:
+      summary: Upload a post
+      tags:
+        - Posts
       responses:
         '201':
-          description: User created successfully
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Authorization" }
-        '200':
-          description: User logged in successfully
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Authorization" }
-        '400':
-          description: Bad request. Invalid input data.
-        '500':
-          description: Internal server error. Failed to process the request.
-
-  /user/{userID}/username:
-    parameters:
-      - name: userID
-        in: path
-        description: Check the userID of the user who wants to set the username
-        schema: { $ref: "#/components/schemas/User/properties/userid"}
-        required: true
-
-    put:
-      tags: ["User"]
-      summary: Imposta nome utente
-      operationId: setMyUserName
-      description: |-
-        Set a new username. If the username is already taken, the user
-        is not authorized or the username is not valid the request will fail.
-      security:
-        - controllo: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              description: New username for the user
-              type: object
-              properties:
-                username: { $ref: "#/components/schemas/User/properties/username"}
-      responses:
-        '200':
-          description: Nome utente impostato con successo
-        '400':
-          description: Errore nei dati della richiesta
-        '401':
-          description: Autorizzazione non concessa
-        '404':
-          description: Indirizzo email non trovato
-
-
-  /photo/{photoID}/user/{userid}:
-    post:
-      tags: ["photo"]
-      summary: Carica nuova foto
-      operationId: uploadPhoto
-      description: Let the user upload a photo on his feed
-      security:
-        - controllo: []
-      requestBody: 
-        required: true
-        content:
-          multipart/form-data:
-              schema:
-                description: Need the photo to upload and the caption
-                type: object
-                properties:
-                  caption: {$ref: '#/components/schemas/Photo/properties/caption'}
-                  file:
-                    type: string
-                    format: byte
-      responses:
-        '400':
-          description: Error in the request data
-        '200':
-          description: Image uploaded successfully!
-
-  /user/followings:
-    post:
-      summary: Seguire un'utente
-      operationId: followUser
-      security:
-        - controllo: []
-      requestBody:
-          description: ID di chi deve essere seguito
-          required: true
-          content:
-            application/json: 
-              schema:
-                $ref: '#/components/schemas/User'
-      responses:
-        '200':
-          description: utente seguito!
-        '400':
-          description: Errore nei dati della richiesta
-
-  /user/unfollowings:
-    post:
-      summary: smettere di seguire un'utente
-      operationId: unfollowUser
-      security:
-        - controllo: []
-      requestBody:
-        description: id di chi viene smesso di seguire
-        required: true
-        content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-      responses:
-        '200':
-          description: utente seguito!
-        '400':
-          description: Errore nei dati della richiesta
-
-  /user/{user_id}/user/{user_to_ban_id}:
-    post:
-      summary: Bloccare un utente
-      operationId: banUser
-      security:
-        - controllo: []
-      parameters:
-      - name: user_id
-        in: path
-        description: chi banna
-        required: true
-        content:
-          application/json: 
-            schema:
-              $ref: '#/components/schemas/User'
-      - name: user_to_ban_id
-        in: path 
-        description: chi viene bloccato
-        required: true
-        content:
-          application/json: 
-            schema:
-              $ref: '#/components/schemas/User'
-      responses:
-        '200':
-          description: Utente bloccato
-        '400':
-          description: Errore nei dati della richiesta
-  /user/{user_id}/bans/{user_to_unban_id}:
-    post:
-      summary: Sbloccare un utente
-      operationId: unbanUser
-      security:
-        - controllo: []
-      parameters:
-      - name: user_id
-        in: path
-        description: chi unbanna
-        required: true
-        content:
-          application/json: 
-            schema:
-              $ref: '#/components/schemas/User'
-      - name: user_to_unban_id
-        in: path 
-        description: chi viene sbloccato
-        required: true
-        content:
-          application/json: 
-            schema:
-              $ref: '#/components/schemas/User'
-      responses:
-        '200':
-          description: Utente bloccato
-        '400':
-          description: Errore nei dati della richiesta
-  /user/id/profile:
+          description: Post uploaded
     get:
-      summary: Visualizza il mio profilo
-      operationId: getUserProfile
-      description: permette all'utente di visualizzare il proprio profilo
-      security:
-        - controllo: []
-      responses:
-        "200":
-          description: Profilo visualizzato con successo
-          content:
-            application/json: 
-              schema:
-                $ref: '#/components/schemas/User'
-        "401":
-          description: Errore nella richiesta
-  /stream:
-    get:
-      summary: Visualizza la home
-      operationId: getMyStream
-      description: Permette all'utente di visualizzare lo stream
-      security:
-        - controllo: []
-      responses:
-        "200":
-          description: Stream visualizzato con successo
-          content:
-            application/json: 
-              schema:
-                $ref: '#/components/schemas/Profile'
-        "401":
-          description: Errore nella richiesta
-  /user/user_id/photo/photo_to_like_id:
-    put:
-      summary: Mettere mi piace ad una foto
-      operationId: likePhoto
-      description: Permette all'utente di mettere like a una foto
-      security:
-        - controllo: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                user_id:
-                  $ref: '#/components/schemas/User'
-                photo_to_like_id:
-                  $ref: '#/components/schemas/Photo'
-      responses:
-        "200":
-          description: Like avvenuto con successo
-          content:
-            application/json: 
-              schema: {$ref: "#/components"} #RISOLVI
-        "401":
-          description: Errore nella richiesta
-  /user/user_id/photo/photo_to_unlike_id:
-    put:
-      summary: Togliere mi piace ad una foto
-      operationId: unlikePhoto
-      description: Permette all'utente di togliere like a una foto
-      security:
-        - controllo: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                user_id:
-                  $ref: '#/components/schemas/User'
-                photo_to_unlike_id:
-                  $ref: '#/components/schemas/Photo'
-      responses:
-        "200":
-          description: Like tolto con successo
-          content:
-            application/json: 
-              schema:
-                $ref: '#/components/schemas/Photo/properties/nlike'
-        "401":
-          description: Errore nella richiesta
-  /user/user_id/photo/photo_to_comment_id:
-    put:
-      summary: Commentare una foto
-      operationId: commentPhoto
-      description: Permette all'utente di commentare una foto
-      security:
-        - controllo: []
-      requestBody: 
-        required: true
-        content:
-          application/json: 
-            schema:
-              type: object 
-              properties:
-                user_id:
-                  $ref: '#/components/schemas/User'
-                photo_to_comment_id:
-                  $ref: '#/components/schemas/Photo'
+      summary: Get user posts
+      tags:
+        - Posts
       responses:
         '200':
-          description: Commentato con successo
-          content:
-            application/json: 
-              schema:
-                $ref: '#/components/schemas/comment'
-        '401':
-          description: Errore nella richiesta
-  /user/user_id/photo/photo_to_uncomment_id:
-    put:
-      summary: Cancellare un commento da una foto
-      operationId: uncommentPhoto
-      description: Permette all'utente di cancellare un commento da una foto
-      security:
-        - controllo: []
-      requestBody: 
-        required: true
-        content:
-          application/json: 
-            schema:
-              type: object 
-              properties:
-                user_id:
-                  $ref: '#/components/schemas/User'
-                photo_to_uncomment_id:
-                  $ref: '#/components/schemas/Photo'
-      responses:
-        '200':
-          description: Commento cancellato con successo
-          content:
-            application/json: 
-              schema:
-                $ref: '#/components/schemas/comment'
-        '401':
-          description: Errore nella richiesta
-  /user/photos/photoID:
-    get:
-      operationId: findPhoto
-      summary: Restituisce la foto che si desidera cancellare
-      security:
-        - controllo: []
-      responses:
-        "200":
-          description: Foto trovata con successo
-          content:
-            application/json: 
-              schema:
-                $ref: '#/components/schemas/User'
-        "401":
-          description: Errore nella richiesta      
+          description: List of posts retrieved
 
+  /profiles/{profileUserID}/posts/{postID}/caption:
+    put:
+      summary: Change post caption
+      tags:
+        - Posts
+      responses:
+        '200':
+          description: Caption updated
+
+  /profiles/{profileUserID}/posts/{postID}:
     delete:
-      operationId: deletePhoto
-      summary: cancella la foto
-      security:
-        - controllo: []
+      summary: Delete a post
+      tags:
+        - Posts
       responses:
-        "200":
-          description: foto cancellata
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
+        '204':
+          description: Post deleted
 
+  /profiles/{profileUserID}/posts/{postID}/likes/{userID}:
+    put:
+      summary: Like a post
+      tags:
+        - Posts
+      responses:
+        '200':
+          description: Post liked
+    delete:
+      summary: Unlike a post
+      tags:
+        - Posts
+      responses:
+        '200':
+          description: Post unliked
+
+  /profiles/{profileUserID}/posts/{postID}/likes:
+    get:
+      summary: Get likes of a post
+      tags:
+        - Posts
+      responses:
+        '200':
+          description: List of likes retrieved
+
+  /profiles/{profileUserID}/posts/{postID}/comments:
+    post:
+      summary: Comment on a post
+      tags:
+        - Posts
+      responses:
+        '201':
+          description: Comment added
+    get:
+      summary: Get comments on a post
+      tags:
+        - Posts
+      responses:
+        '200':
+          description: List of comments retrieved
+
+  /profiles/{profileUserID}/posts/{postID}/comments/{commentID}:
+    delete:
+      summary: Delete a comment
+      tags:
+        - Posts
+      responses:
+        '204':
+          description: Comment deleted
+
+  /profiles/{profileUserID}/feed:
+    get:
+      summary: Get user feed
+      tags:
+        - Posts
+      responses:
+        '200':
+          description: Feed retrieved
+
+  /profiles:
+    get:
+      summary: Search users
+      tags:
+        - User Profile
+      responses:
+        '200':
+          description: Search results retrieved
+
+  /liveness:
+    get:
+      summary: Check API liveness
+      tags:
+        - Misc
+      responses:
+        '200':
+          description: API is live
