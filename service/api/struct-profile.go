@@ -3,7 +3,7 @@ package api
 import "github.com/mouvzee/wasaphoto/service/database"
 
 type Profile struct {
-	User       User
+	User       User		
 	Name       string
 	Follower   int
 	Following  int

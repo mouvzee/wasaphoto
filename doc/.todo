@@ -1,2 +1,4 @@
-- aggiungi il controllo dell'autorizzazione in ogni percorso creato nell'api
+- booooo aggiungi il controllo dell'autorizzazione in ogni percorso creato nell'api
 - ricordati che le responses devono essere sempre controllate e specificate
+- porco il mio dio devi implementare i parameters!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+- non puoi richiamare uno schemas dentro parameters, devi creare un oggetto con le properties che vuoi passare

@@ -17,12 +17,6 @@ tags:
     description: Everything about the stream
 components:
   schemas:
-    userID:
-      title: User id 
-      description: The numeric user id
-      type: integer
-      example: 100
-      minimum: 1 
     username:
       title: Username
       description: The username of the user
@@ -38,18 +32,6 @@ components:
       format: byte
       minLength: 0
       maxLength: 1000000000
-    photoID:
-      title: Photo id
-      description: The numeric photo id
-      type: integer
-      example: 100
-      minimum: 1
-    commentID:
-      title: Comment id
-      description: The numeric comment id
-      type: integer
-      example: 100
-      minimum: 1
     caption:
       title: Caption
       description: The caption of the photo
@@ -73,36 +55,45 @@ components:
       type: integer
       example: 10
       minimum: 1
+      maximum: 10000
     User:
       title: User
       description: The user object
       type: object
       properties:
-        userID: { $ref: '#/components/schemas/userID' }
-        username: { $ref: '#/components/schemas/username' }
-        profilePicture: { $ref: '#/components/schemas/imageData' }
+        userID:
+          type: integer
+          description: The user id of the user.
+          example: 100
+          minimum: 1
+          maximum: 10000
+        username: { $ref: "#/components/schemas/username" }
+        profilePicture: { $ref: "#/components/schemas/imageData" }
     Profile:
       title: Profile
       description: The profile of the user
       type: object
       properties:
-        user: { $ref: '#/components/schemas/User' }
+        user: { $ref: "#/components/schemas/User" }
         name: { type: string }
         follower:
           type: integer
           description: The number of followers
           example: 100
           minimum: 0
+          maximum: 10000
         following:
           type: integer
           description: The number of following users
           example: 100
           minimum: 0
+          maximum: 10000
         postsCount:
           type: integer
           description: The number of posts
           example: 100
           minimum: 0
+          maximum: 10000
         isFollowed:
           type: boolean
           description: True if the user is followed by the authenticated user
@@ -112,19 +103,21 @@ components:
       description: List of photos
       type: object
       properties:
-        imageData: { $ref: '#/components/schemas/imageData' }
-        caption: { $ref: '#/components/schemas/caption' }
-        createdAt: { $ref: '#/components/schemas/createdAt' }
+        imageData: { $ref: "#/components/schemas/imageData" }
+        caption: { $ref: "#/components/schemas/caption" }
+        createdAt: { $ref: "#/components/schemas/createdAt" }
         nlike:
           type: integer
           description: The number of likes
           example: 100
           minimum: 0
+          maximum: 10000
         ncomment:
           type: integer
           description: The number of comments
           example: 100
           minimum: 0
+          maximum: 10000
         liked:
           type: boolean
           description: True if the photo is liked by the authenticated user
@@ -133,19 +126,19 @@ components:
       title: Photo list
       description: List of photos
       type: array
-      items: { $ref: '#/components/schemas/Photo' }
+      items: { $ref: "#/components/schemas/Photo" }
       minItems: 0
       maxItems: 100
     UserList:
       title: User list
       description: List of users
       type: array
-      items: 
+      items:
         type: object
         description: user
         properties:
-          user: { '#/components/schemas/User' }
-          imageData: { $ref: '#/components/schemas/imageData' }
+          user: { $ref: "#/components/schemas/User" }
+          imageData: { $ref: "#/components/schemas/imageData" }
       minItems: 0
       maxItems: 100
     Authorization:
@@ -153,16 +146,21 @@ components:
       description: The authorization is the user id.
       type: object
       properties:
-        user: { $ref: '#/components/schemas/User' }
-        token: { $ref: '#/components/schemas/Auth' }
+        user: { $ref: "#/components/schemas/User" }
+        token: { $ref: "#/components/schemas/Auth" }
     Comment:
       title: Comment
       description: The comment object of the post
       type: object
       properties:
-        commentID: { $ref: '#/components/schemas/commentID' }
-        ownerID: { $ref: '#/components/schemas/userID' }
-        user: { $ref: '#/components/schemas/User' }
+        commentID:
+          type: integer
+          description: The comment id of the comment.
+          example: 100
+          minimum: 1
+          maximum: 10000
+        ownerID: { $ref: "#/components/parameters/userID" }
+        user: { $ref: "#/components/schemas/User" }
         lyric:
           type: string
           description: The comment of the post
@@ -170,15 +168,55 @@ components:
           pattern: '^[^\/\\]{1,64}$'
           minLength: 1
           maxLength: 64
-        createdAt: { $ref: '#/components/schemas/createdAt' }
+        createdAt: { $ref: "#/components/schemas/createdAt" }
     CommentList:
       title: Comment list
       description: List of all comments on the photo.
       type: array
-      items: { $ref: '#/components/schemas/Comment' }
+      items: { $ref: "#/components/schemas/Comment" }
       minItems: 0
       maxItems: 100
-
+  parameters:
+    userID:
+      name: userID
+      in: path
+      required: true
+      description: The user id of the user.
+      schema:
+        type: integer
+        example: 100
+        minimum: 1
+        maximum: 10000
+    targetUserID:
+      name: targetUserID
+      in: path
+      description: The user id of the user.
+      required: true
+      schema:
+        type: integer
+        example: 100
+        minimum: 1
+        maximum: 10000
+    photoID:
+      name: photoID
+      in: path
+      description: The numeric photo id
+      required: true
+      schema:
+        type: integer
+        example: 100
+        minimum: 1
+        maximum: 10000
+    commentID:
+      name: commentID
+      in: path
+      description: The numeric comment id
+      required: true
+      schema:
+        type: integer
+        example: 100
+        minimum: 1
+        maximum: 10000
   responses:
     # 200 response
     Success:
@@ -187,7 +225,7 @@ components:
         text/plain:
           schema:
             description: Success message
-            type: string
+            type: object
             properties:
               message:
                 type: string
@@ -198,7 +236,7 @@ components:
         text/plain:
           schema:
             description: Created message
-            type: string
+            type: object
             properties:
               message:
                 type: string
@@ -209,7 +247,7 @@ components:
         text/plain:
           schema:
             description: No content message
-            type: string
+            type: object
             properties:
               message:
                 type: string
@@ -220,7 +258,7 @@ components:
         text/plain:
           schema:
             description: Bad request message
-            type: string
+            type: object
             properties:
               message:
                 type: string
@@ -231,7 +269,7 @@ components:
         text/plain:
           schema:
             description: Unauthorized message
-            type: string
+            type: object
             properties:
               message:
                 type: string
@@ -242,7 +280,7 @@ components:
         text/plain:
           schema:
             description: Forbidden message
-            type: string
+            type: object
             properties:
               message:
                 type: string
@@ -253,7 +291,7 @@ components:
         text/plain:
           schema:
             description: Not found message
-            type: string
+            type: object
             properties:
               message:
                 type: string
@@ -264,11 +302,10 @@ components:
         text/plain:
           schema:
             description: Internal server error message
-            type: string
+            type: object
             properties:
               message:
                 type: string
-    
 
 paths:
   /login:
@@ -285,21 +322,17 @@ paths:
               description: username of the user
               type: object
               properties:
-                username: { $ref: '#/components/schemas/username' }
+                username: { $ref: "#/components/schemas/username" }
         required: true
       responses:
-        '200': { $ref: '#/components/responses/Success' }
-        "201": { $ref: '#/components/responses/Created' }
-        "400": { $ref: '#/components/responses/BadRequest' }
-        "500": { $ref: '#/components/responses/InternalServerError' }
+        "200": { $ref: "#/components/responses/Success" }
+        "201": { $ref: "#/components/responses/Created" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}:
+  /profiles/{userID}:
     parameters:
-      - name: profileUserID
-        in: path
-        description: profile of the user id you want to see.
-        required: true
-        schema: { $ref: '#/components/schemas/userID' }
+      - $ref: "#/components/parameters/userID"
 
     get:
       summary: Get user profile
@@ -308,15 +341,15 @@ paths:
       operationId: getUserProfile
       description: Get the profile of the user.
       responses:
-        '200':
+        "200":
           description: User profile retrieved
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Profile' }
-        '404': { $ref: '#/components/responses/NotFound' }
-        '500': { $ref: '#/components/responses/InternalServerError' }
-        "400": { $ref: '#/components/responses/BadRequest' }
-        "401": { $ref: '#/components/responses/Unauthorized' }
+              schema: { $ref: "#/components/schemas/Profile" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
 
     delete:
       summary: Delete user
@@ -329,19 +362,15 @@ paths:
           description: User deleted
           content:
             application/json:
-              schema: { $ref: '#/components/responses/Success' }
-        "400": { $ref: '#/components/responses/BadRequest' }
-        "401": { $ref: '#/components/responses/Unauthorized' }
-        "403": { $ref: '#/components/responses/Forbidden' }
-        "500": { $ref: '#/components/responses/InternalServerError' }
+              schema: { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/username:
+  /profiles/{userID}/username:
     parameters:
-      - name: profileUserID
-        in: path
-        description: profile of the user id you want to change the username.
-        required: true
-        schema: { $ref: '#/components/schemas/userID' }
+      - $ref: "#/components/parameters/userID"
 
     put:
       summary: Change username
@@ -357,26 +386,22 @@ paths:
               description: username of the user
               type: object
               properties:
-                username: { $ref: '#/components/schemas/username' }
+                username: { $ref: "#/components/schemas/username" }
         required: true
       responses:
-        '200':
+        "200":
           description: Username updated
           content:
             application/json:
-              schema: { $ref: '#/components/responses/Success' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '401': { $ref: '#/components/responses/Unauthorized' }
-        '403': { $ref: '#/components/responses/Forbidden' }
+              schema: { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
 
-  /profiles/{profileUserID}/profile-picture:
+  /profiles/{userID}/profile-picture:
     parameters:
-      - name: profileUserID
-        in: path
-        description: profile of the user id you want to change the profile picture.
-        required: true
-        schema: { $ref: '#/components/schemas/userID' }
-    
+      - $ref: "#/components/parameters/userID"
+
     put:
       summary: Change or Set profile picture
       tags:
@@ -390,9 +415,9 @@ paths:
               type: object
               description: file to upload.
               properties:
-                imageData: { $ref: '#/components/schemas/imageData' }
+                imageData: { $ref: "#/components/schemas/imageData" }
       responses:
-        '200':
+        "200":
           description: Profile picture updated successfully
           content:
             application/json:
@@ -400,181 +425,408 @@ paths:
                 type: object
                 description: URL of the profile picture
                 properties:
-                  schema: { $ref: '#/components/schemas/imageData' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '401': { $ref: '#/components/responses/Unauthorized' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '500': { $ref: '#/components/responses/InternalServerError' }
+                  schema: { $ref: "#/components/schemas/imageData" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/reset-profile-picture:
+  /profiles/{userID}/reset-profile-picture:
+    parameters:
+      - $ref: "#/components/parameters/userID"
     put:
       summary: Reset profile picture
       tags:
         - User Profile
-      responses:
-        '200':
-          description: Profile picture reset
+      operationId: resetMyProfilePic
+      description: Reset the profile picture of the user to default.
 
-  /profiles/{profileUserID}/followings/{targetUserID}:
+      responses:
+        "200":
+          description: Profile picture resetted successfully
+          content:
+            application/json:
+              schema: { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
+  /profiles/{userID}/followings/{targetUserID}:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+      - $ref: "#/components/parameters/targetUserID"
     put:
       summary: Follow a user
-      tags:
-        - Social
+      tags: ["User"]
+      operationId: followUser
       responses:
-        '200':
-          description: User followed
+        "200":
+          description: User followed successfully.
+          content:
+            text/plain:
+              schema: { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
     delete:
       summary: Unfollow a user
-      tags:
-        - Social
+      tags: ["User"]
+      operationId: unfollowUser
+      description: Unfollow the user with the given userID and delete it from the following
       responses:
-        '200':
-          description: User unfollowed
+        "200":
+          description: User unfollowed successfully.
+          content:
+            text/plain:
+              schema: { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/followings:
+  /profiles/{userID}/followings:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+
     get:
       summary: Get followings
-      tags:
-        - Social
-      responses:
-        '200':
-          description: List of followings retrieved
+      tags: ["User"]
+      operationId: getMyFollowings
+      description: Get the list of users that the user is following.
 
-  /profiles/{profileUserID}/followers:
+      responses:
+        "200":
+          description: List of followings retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserList" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
+  /profiles/{userID}/followers:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+
     get:
       summary: Get followers
-      tags:
-        - Social
+      tags: ["User"]
+      operationId: getMyFollowers
+      description: Get the list of users that are following the user.
       responses:
-        '200':
+        "200":
           description: List of followers retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserList" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/bans/{targetUserID}:
+  /profiles/{userID}/bans/{targetUserID}:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+      - $ref: "#/components/parameters/targetUserID"
+
     put:
       summary: Ban a user
-      tags:
-        - Social
+      tags: ["User"]
+      operationId: banUser
+      description: Ban the user with the given userID and delete it from the following
       responses:
-        '200':
-          description: User banned
+        "200":
+          description: User banned successfully.
+          content:
+            text/plain:
+              schema: { $ref: "#/components/schemas/User" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
     delete:
       summary: Unban a user
-      tags:
-        - Social
+      tags: ["User"]
+      operationId: unbanUser
+      description: Unban the user with the given userID and delete it from the following
       responses:
-        '200':
-          description: User unbanned
+        "200":
+          description: User unbanned successfully.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/bans:
+  /profiles/{userID}/bans:
+    parameters:
+      - $ref: "#/components/parameters/userID"
     get:
       summary: Get banned users
-      tags:
-        - Social
+      tags: ["User"]
+      operationId: getMyBans
+      description: Get the list of users that are banned by the user.
       responses:
-        '200':
+        "200":
           description: List of banned users retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserList" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/posts:
+  /profiles/{userID}/posts:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+
     post:
       summary: Upload a post
-      tags:
-        - Posts
+      tags: ["Posts"]
+      operationId: uploadPhoto
+      description: Upload a photo with a caption.
+      requestBody:
+        description: Photo to upload
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                imageData: { $ref: "#/components/schemas/imageData" }
+                caption: { $ref: "#/components/schemas/caption" }
+        required: true
+
       responses:
-        '201':
-          description: Post uploaded
+        "201":
+          description: Post uploaded successfully.
+          content:
+            application/json:
+              schema: { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
     get:
       summary: Get user posts
-      tags:
-        - Posts
+      tags: ["Posts"]
+      operationId: getPosts
+      description: Get the list of posts of the user.
       responses:
-        '200':
+        "200":
           description: List of posts retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PhotoList" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/posts/{postID}/caption:
+  /profiles/{userID}/posts/{photoID}/caption:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+      - $ref: "#/components/parameters/photoID"
     put:
       summary: Change post caption
       tags:
         - Posts
       responses:
-        '200':
+        "200":
           description: Caption updated
 
-  /profiles/{profileUserID}/posts/{postID}:
+  /profiles/{userID}/posts/{photoID}:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+      - $ref: "#/components/parameters/photoID"
+
     delete:
       summary: Delete a post
-      tags:
-        - Posts
+      tags: ["Posts"]
+      operationId: deletePhoto
+      description: Delete the post with the given photoID.
       responses:
-        '204':
-          description: Post deleted
+        "200":
+          description: Post deleted successfully.
+          content:
+            text/plain:
+              schema: { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/posts/{postID}/likes/{userID}:
+  /profiles/{userID}/posts/{photoID}/likes/{targetUserID}:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+      - $ref: "#/components/parameters/photoID"
+      - $ref: "#/components/parameters/targetUserID"
+
     put:
       summary: Like a post
-      tags:
-        - Posts
+      tags: ["Posts"]
+      operationId: likePhoto
+      description: Like the post with the given photoID.
       responses:
-        '200':
-          description: Post liked
+        "200":
+          description: Post liked successfully.
+          content:
+            text/plain:
+              schema: { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
     delete:
       summary: Unlike a post
-      tags:
-        - Posts
+      tags: ["Posts"]
+      operationId: unlikePhoto
+      description: Unlike the post with the given photoID.
       responses:
-        '200':
-          description: Post unliked
+        "200":
+          description: Post unliked successfully.
+          content:
+            text/plain:
+              schema: { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/posts/{postID}/likes:
+  /profiles/{userID}/posts/{photoID}/likes:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+      - $ref: "#/components/parameters/photoID"
+
     get:
       summary: Get likes of a post
-      tags:
-        - Posts
+      tags: ["Posts"]
+      operationId: getLikes
+      description: Get the list of users that liked the post.
       responses:
-        '200':
+        "200":
           description: List of likes retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserList" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/posts/{postID}/comments:
+  /profiles/{userID}/posts/{photoID}/comments:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+      - $ref: "#/components/parameters/photoID"
+
     post:
       summary: Comment on a post
-      tags:
-        - Posts
+      tags: ["Posts"]
+      operationId: commentPhoto
+      description: Comment on the post with the given photoID.
       responses:
-        '201':
-          description: Comment added
+        "201":
+          description: Comment added successfully.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Comment" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
+
     get:
       summary: Get comments on a post
-      tags:
-        - Posts
+      tags: ["Posts"]
+      operationId: getComments
+      description: Get the list of comments on the post with the given photoID.
       responses:
-        '200':
+        "200":
           description: List of comments retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CommentList" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/posts/{postID}/comments/{commentID}:
+  /profiles/{userID}/posts/{photoID}/comments/{commentID}:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+      - $ref: "#/components/parameters/photoID"
+      - $ref: "#/components/parameters/commentID"
     delete:
       summary: Delete a comment
-      tags:
-        - Posts
+      tags: ["Posts"]
+      operationId: uncommentPhoto
+      description: Delete the comment with the given commentID.
       responses:
-        '204':
-          description: Comment deleted
+        "200":
+          description: Comment deleted successfully.
+          content:
+            text/plain:
+              schema: { $ref: "#/components/responses/Success" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
-  /profiles/{profileUserID}/feed:
+  /profiles/{userID}/feed:
+    parameters:
+      - $ref: "#/components/parameters/userID"
+
     get:
       summary: Get user feed
-      tags:
-        - Posts
+      tags: ["Stream"]
+      operationId: getMyStream
+      description: Get the list of posts of the users that the user is following.
       responses:
-        '200':
-          description: Feed retrieved
+        "200":
+          description: Feed retrieved successfully.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PhotoList" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
   /profiles:
+    parameters:
+      - name: search
+        in: query
+        description: Search for users by username.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 13
+          pattern: "^[a-z0-9]{3,13}$"
+          example: "john"
+
     get:
       summary: Search users
-      tags:
-        - User Profile
+      tags: ["User"]
+      operationId: searchUsers
+      description: Get the list of users that match the search query.
       responses:
-        '200':
-          description: Search results retrieved
+        "200":
+          description: List of users retrieved
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserList" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "500": { $ref: "#/components/responses/InternalServerError" }
 
   /liveness:
     get:
@@ -582,5 +834,5 @@ paths:
       tags:
         - Misc
       responses:
-        '200':
+        "200":
           description: API is live
