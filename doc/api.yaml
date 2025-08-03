@@ -56,17 +56,18 @@ components:
       example: 10
       minimum: 1
       maximum: 10000
+    UserID:
+      type: integer
+      description: The user id of the user.
+      example: 100
+      minimum: 1
+      maximum: 10000
     User:
       title: User
       description: The user object
       type: object
       properties:
-        userID:
-          type: integer
-          description: The user id of the user.
-          example: 100
-          minimum: 1
-          maximum: 10000
+        userID: { $ref: "#/components/schemas/UserID" }
         username: { $ref: "#/components/schemas/username" }
         profilePicture: { $ref: "#/components/schemas/imageData" }
     Profile:
@@ -159,7 +160,7 @@ components:
           example: 100
           minimum: 1
           maximum: 10000
-        ownerID: { $ref: "#/components/parameters/userID" }
+        ownerID: { $ref: "#/components/schemas/UserID" }
         user: { $ref: "#/components/schemas/User" }
         lyric:
           type: string
@@ -358,11 +359,7 @@ paths:
       operationId: deleteUser
       description: Delete the user.
       responses:
-        "200":
-          description: User deleted
-          content:
-            application/json:
-              schema: { $ref: "#/components/responses/Success" }
+        "200": { $ref: "#/components/responses/Success" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -389,11 +386,7 @@ paths:
                 username: { $ref: "#/components/schemas/username" }
         required: true
       responses:
-        "200":
-          description: Username updated
-          content:
-            application/json:
-              schema: { $ref: "#/components/responses/Success" }
+        "200": { $ref: "#/components/responses/Success" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -442,11 +435,7 @@ paths:
       description: Reset the profile picture of the user to default.
 
       responses:
-        "200":
-          description: Profile picture resetted successfully
-          content:
-            application/json:
-              schema: { $ref: "#/components/responses/Success" }
+        "200": { $ref: "#/components/responses/Success" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -461,11 +450,7 @@ paths:
       tags: ["User"]
       operationId: followUser
       responses:
-        "200":
-          description: User followed successfully.
-          content:
-            text/plain:
-              schema: { $ref: "#/components/responses/Success" }
+        "200": { $ref: "#/components/responses/Success" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -477,11 +462,7 @@ paths:
       operationId: unfollowUser
       description: Unfollow the user with the given userID and delete it from the following
       responses:
-        "200":
-          description: User unfollowed successfully.
-          content:
-            text/plain:
-              schema: { $ref: "#/components/responses/Success" }
+        "200": { $ref: "#/components/responses/Success" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -603,11 +584,7 @@ paths:
         required: true
 
       responses:
-        "201":
-          description: Post uploaded successfully.
-          content:
-            application/json:
-              schema: { $ref: "#/components/responses/Success" }
+        "200": { $ref: "#/components/responses/Success" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -652,11 +629,7 @@ paths:
       operationId: deletePhoto
       description: Delete the post with the given photoID.
       responses:
-        "200":
-          description: Post deleted successfully.
-          content:
-            text/plain:
-              schema: { $ref: "#/components/responses/Success" }
+        "200": { $ref: "#/components/responses/Success" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -674,11 +647,7 @@ paths:
       operationId: likePhoto
       description: Like the post with the given photoID.
       responses:
-        "200":
-          description: Post liked successfully.
-          content:
-            text/plain:
-              schema: { $ref: "#/components/responses/Success" }
+        "200": { $ref: "#/components/responses/Success" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -690,11 +659,7 @@ paths:
       operationId: unlikePhoto
       description: Unlike the post with the given photoID.
       responses:
-        "200":
-          description: Post unliked successfully.
-          content:
-            text/plain:
-              schema: { $ref: "#/components/responses/Success" }
+        "200": { $ref: "#/components/responses/Success" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -769,11 +734,7 @@ paths:
       operationId: uncommentPhoto
       description: Delete the comment with the given commentID.
       responses:
-        "200":
-          description: Comment deleted successfully.
-          content:
-            text/plain:
-              schema: { $ref: "#/components/responses/Success" }
+        "200": { $ref: "#/components/responses/Success" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
