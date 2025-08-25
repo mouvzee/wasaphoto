@@ -14,7 +14,7 @@ import (
 getPosts is the handler for the GET /users/:profileUserID/posts endpoint
 It return the posts of the user with the given profileUserID.
 */
-func (rt *_router) getPosts(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getUserPhotos(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID from the URL
 	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
 	if err != nil {

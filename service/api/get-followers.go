@@ -14,7 +14,7 @@ import (
 GetMyFollowers is the handler for the GET /users/:profileUserID/followers endpoint
 It return the list of the followers of the user with the given profileUserID
 */
-func (rt *_router) getMyFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID and targetUserID from the URL
 	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
 	if err != nil {

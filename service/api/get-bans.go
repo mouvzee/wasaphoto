@@ -15,7 +15,7 @@ getMyBans is the handler for GET /users/:profileUserID/bans endpoint
 It return the list of the users that the profileUserID has banned
 */
 
-func (rt *_router) getMyBans(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getBannedList(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID and targetUserID from the URL
 	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
 	if err != nil {

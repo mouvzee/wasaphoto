@@ -3,8 +3,6 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"fmt"
-	"os"
 )
 
 var adduser = `INSERT INTO User (userID, username) VALUES (?,?);`
@@ -43,12 +41,6 @@ func (db *appdbimpl) CreateUser(x User) (User, error) {
 
 	// set the userID
 	user.UserID = id + 1
-
-	//create a folder for the user with userID in the path
-	p := "./users-data/" + fmt.Sprint(user.UserID) + "/pubblications"
-	if err = os.MkdirAll(p, os.ModePerm); err != nil {
-		return user, err
-	}
 
 	//insert User in the database
 	_, err = db.c.Exec(adduser, user.UserID, user.Username)

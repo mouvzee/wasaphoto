@@ -62,7 +62,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	auth := Authorization{user, user.UserID}
 
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("Content-type", "application/json")
 	if err := json.NewEncoder(w).Encode(auth); err != nil {
 		ctx.Logger.WithError(err).Error("no encoding for the response")
 		w.WriteHeader(http.StatusInternalServerError)
