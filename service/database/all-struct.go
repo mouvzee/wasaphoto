@@ -12,7 +12,6 @@ type User struct {
 type Photo struct {
 	PhotoID    int       `json:"photoID"`
 	User       User      `json:"user"`
-	URL        string    `json:"URL"`
 	ImageData  []byte    `json:"imageData"`
 	Caption    string    `json:"caption"`
 	Nlike      int       `json:"nlike"`
@@ -32,7 +31,6 @@ type Comment struct {
 
 type Profile struct {
 	User       User   `json:"user"`
-	Name       string `json:"name"`
 	Follower   int    `json:"follower"`
 	Following  int    `json:"following"`
 	PostsCount int    `json:"postsCount"`

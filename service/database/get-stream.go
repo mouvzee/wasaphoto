@@ -1,7 +1,7 @@
 package database
 
-var join_FOLLOWINGS_POSTS = `SELECT User.userID, User.username, Post.PhotoID, Post.caption, Post.timestamp 
-							FROM (` + union_FOLLOWINGS_ME + `) AS User INNER JOIN Post ON User.userID = Post.userID ORDER BY Post.timestamp DESC LIMIT ?, ?`
+var join_FOLLOWINGS_POSTS = `SELECT User.userID, User.username, Post.PhotoID, Post.caption, Post.created_at 
+							FROM (` + union_FOLLOWINGS_ME + `) AS User INNER JOIN Post ON User.userID = Post.userID ORDER BY Post.created_at DESC LIMIT ?, ?`
 var union_FOLLOWINGS_ME = getFollowingsQUERY + ` UNION SELECT userID, username FROM User WHERE userID=?`
 
 func (db *appdbimpl) GetStream(userID int, offeset int, limit int) ([]Photo, error) {

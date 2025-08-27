@@ -6,7 +6,6 @@ import (
 	"regexp"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/mouvzee/wasaphoto/service/api/methods"
 	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
 
@@ -25,13 +24,8 @@ func (rt *_router) searchUsers(w http.ResponseWriter, r *http.Request, ps httpro
 
 	userID := ctx.UserID
 
-	limit, offset, err := methods.GetLimitAndOffset(r.URL.Query())
-	if err != nil {
-		http.Error(w, "Bad Request "+err.Error(), http.StatusBadRequest)
-		return
-	}
 
-	dbUsers, err := rt.db.SearchUsers(userID, query_search, offset, limit)
+	dbUsers, err := rt.db.SearchUsers(userID, query_search)
 	if err != nil {
 		ctx.Logger.Error("Error searching users ", err)
 		http.Error(w, "Error searching users", http.StatusInternalServerError)

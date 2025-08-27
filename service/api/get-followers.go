@@ -2,12 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/mouvzee/wasaphoto/service/api/methods"
 	"net/http"
 	"strconv"
 
-	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
 
 /*
@@ -16,20 +15,14 @@ It return the list of the followers of the user with the given profileUserID
 */
 func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID and targetUserID from the URL
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
-	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	limit, offset, err := methods.GetLimitAndOffset(r.URL.Query())
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Get the followers
-	dbFollowers, err := rt.db.GetFollowers(profileUserID, offset, limit)
+	dbFollowers, err := rt.db.GetFollowers(profileUserID)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error while getting the followers")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

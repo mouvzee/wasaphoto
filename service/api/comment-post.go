@@ -15,7 +15,7 @@ It creates a new comment for the specified post and returns the new comment
 */
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the user ID from the request
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Invalid profileUserID", http.StatusBadRequest)
 		return
@@ -52,7 +52,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// Create the comment in the database
-	dbComment, err := rt.db.CreateComment(profileUserID, photoID, userID, tmpComment.Lyric)
+	dbComment, err := rt.db.CreateComment(profileUserID, photoID, tmpComment.Lyric)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error creating comment")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

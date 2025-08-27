@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-var GetLastPhotoQUERY = `SELECT MAX(PhotoID) FROM Photo WHERE UserID= ?;`
+var GetLastPhotoQUERY = `SELECT MAX(PhotoID) FROM Post WHERE UserID= ?;`
 
 func (db *appdbimpl) GetLastPhotoID(userID int) (int, error) {
 	var _photoID = sql.NullInt64{Int64: 0, Valid: false}

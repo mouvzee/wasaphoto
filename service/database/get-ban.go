@@ -1,10 +1,10 @@
 package database
 
-var getBanQUERY = "SELECT bannedID from Ban WHERE bannerID=? LIMIT ?,?"
+var getBanQUERY = `SELECT bannedID from Ban WHERE bannerID=?`
 
-func (db *appdbimpl) GetBan(bannerID, offset, limit int) ([]User, error) {
+func (db *appdbimpl) GetBan(bannerID int) ([]User, error) {
 	var b []User
-	lines, err := db.c.Query(getBanQUERY, bannerID, offset, limit)
+	lines, err := db.c.Query(getBanQUERY, bannerID)
 	if err != nil {
 		return nil, err
 	}

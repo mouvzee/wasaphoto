@@ -77,43 +77,43 @@ type AppDatabase interface {
 	//COMMENT
 
 	//create a comment in the database
-	CreateComment(userID, ownerID, photoID int, commentText string) (Comment, error)
+	CreateComment(userID int, photoID int, commentText string) (Comment, error)
 	//delete a comment in the database
-	DeleteComment(commentID, creatorID, photoID int) error
+	DeleteComment(commentID int, photoID int) error
 	//get the comments of a post
-	GetComments(photoID, creatorID, offset, limit int) ([]Comment, error)
+	GetComments(photoID int) ([]Comment, error)
 	//LIKE
 
 	//create a like in the database
-	CreateLike(userID int, creatorID int, PhotoID int) error
+	CreateLike(userID int, PhotoID int) error
 	//delete a like in the database
-	DeleteLike(userID, creatorID, PhotoID int) error
+	DeleteLike(userID int, PhotoID int) error
 	//get the likes of a post
-	GetLike(PhotoID, creatorID, offset, limit int) ([]User, error)
+	GetLike(PhotoID int) ([]User, error)
 
 	//FOLLOW
 
 	//create a follow in the database
-	CreateFollow(followerID, followedID int) error
+	CreateFollow(followerID int, followedID int) error
 	//get the followers of a user and return them
-	GetFollowers(followedID int, offset int, limit int) ([]User, error)
+	GetFollowers(followedID int) ([]User, error)
 	//get the following of a user and return them
-	GetFollowings(followerID int, offset int, limit int) ([]User, error)
+	GetFollowings(followerID int) ([]User, error)
 	//delete a follow in the database
-	DeleteFollow(followerID, followedID int) error
+	DeleteFollow(followerID int, followedID int) error
 	//return true if the user is following the other user
-	IsFollowing(followerID, followedID int) (bool, error)
+	IsFollowing(followerID int, followedID int) (bool, error)
 
 	//BAN
 
 	//create a ban in the database
-	CreateBan(bannerID, bannedID int) error
+	CreateBan(bannerID int, bannedID int) error
 	//get all the banned users from te current user
-	GetBan(bannerID, offset, limit int) ([]User, error)
+	GetBan(bannerID int) ([]User, error)
 	//delete te ban between two users in the database
-	DeleteBan(bannerID, bannedID int) error
+	DeleteBan(bannerID int, bannedID int) error
 	//Return true if the user is banned by the banner
-	IsBanned(bannedID, bannerID int) (bool, error)
+	IsBanned(bannedID int, bannerID int) (bool, error)
 
 	//PROFILE
 	//visualize the profile of the user
@@ -121,7 +121,7 @@ type AppDatabase interface {
 	//return ture if the username already exist
 	ExistsName(username string) (bool, error)
 
-	SearchUsers(userID int, search string, offset int, limit int) ([]User, error)
+	SearchUsers(userID int, search string) ([]User, error)
 
 	//ping the database if its still working
 	Ping() error

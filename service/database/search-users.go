@@ -4,12 +4,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var query_GETUSERS = `SELECT userID, username FROM User WHERE username regexp ? ORDER BY username LIMIT ?, ? `
+var query_GETUSERS = `SELECT userID, username FROM User WHERE username regexp ? ORDER BY username `
 
-func (db *appdbimpl) SearchUsers(userID int, search string, offset int, limit int) ([]User, error) {
+func (db *appdbimpl) SearchUsers(userID int, search string) ([]User, error) {
 	var users []User
 
-	rows, err := db.c.Query(query_GETUSERS, "^"+search, offset, limit)
+	rows, err := db.c.Query(query_GETUSERS, "^"+search)
 	if err != nil {
 		return nil, err
 	}

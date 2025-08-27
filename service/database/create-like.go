@@ -1,9 +1,9 @@
 package database
 
-var createLikeQUERY = `INSERT INTO Like (userID, creatorID, PhotoID) VALUES (?, ?, ?)`
+var createLikeQUERY = `INSERT INTO Like (userID, PhotoID) VALUES (?, ?)`
 
-func (db *appdbimpl) CreateLike(userID int, creatorID int, PhotoID int) error {
-	_, err := db.c.Exec(createLikeQUERY, userID, creatorID, PhotoID)
+func (db *appdbimpl) CreateLike(userID int, PhotoID int) error {
+	_, err := db.c.Exec(createLikeQUERY, userID, PhotoID)
 
 	return err
 }

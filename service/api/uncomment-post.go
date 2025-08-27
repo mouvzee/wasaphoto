@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
 
 /*
@@ -17,7 +17,7 @@ The comment is deleted from the database.
 
 func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID and PhotoID from the URL
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
@@ -43,7 +43,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Delete the comment
-	err = rt.db.DeleteComment(commentID, profileUserID, PhotoID)
+	err = rt.db.DeleteComment(commentID, PhotoID)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error uncommenting photo")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
 
 /*
@@ -16,7 +16,7 @@ It creates a new post
 */
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID from the URL
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request "+err.Error(), http.StatusBadRequest)
 		return
@@ -53,7 +53,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	fileType := http.DetectContentType(data)
-	if fileType != "image/jpeg" {
+	if fileType != "image/jpeg" && fileType != "image/png" {
 		http.Error(w, "Bad Request wrong file type", http.StatusBadRequest)
 		return
 	}

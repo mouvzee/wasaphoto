@@ -16,7 +16,7 @@ It removes a like from the post with the given ID.
 */
 func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID and PhotoID from the URL
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
@@ -52,7 +52,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	err = rt.db.DeleteLike(profileUserID, PhotoID, userID)
+	err = rt.db.DeleteLike(profileUserID, PhotoID)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRowsAffected) {
 			http.Error(w, "Bad Request there is no one like", http.StatusNotFound)

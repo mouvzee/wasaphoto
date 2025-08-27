@@ -6,14 +6,14 @@ import (
 	"time"
 )
 
-var query_CREATECOMMENT = `INSERT INTO Comment (commentID, userID, ownerID, PhotoID, commentText) VALUES (?, ?, ?, ?, ?);`
+var query_CREATECOMMENT = `INSERT INTO Comment (commentID, userID, PhotoID, commentText) VALUES (?, ?, ?, ?);`
 
-func (db *appdbimpl) CreateComment(userID int, ownerID int, photoID int, commentText string) (Comment, error) {
+func (db *appdbimpl) CreateComment(userID int, photoID int, commentText string) (Comment, error) {
 	var comment Comment
 
 	// Get the last commentID
 	var lastCommentID int
-	lastCommentID, err := db.GetLastCommentID(ownerID, photoID)
+	lastCommentID, err := db.GetLastCommentID(photoID)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return comment, err
 	}
@@ -31,7 +31,7 @@ func (db *appdbimpl) CreateComment(userID int, ownerID int, photoID int, comment
 	}()
 
 	// Create the comment
-	_, err = tx.Exec(query_CREATECOMMENT, lastCommentID+1, userID, ownerID, photoID, commentText)
+	_, err = tx.Exec(query_CREATECOMMENT, lastCommentID+1, userID, photoID, commentText)
 	if err != nil {
 		return comment, err
 	}
@@ -45,7 +45,6 @@ func (db *appdbimpl) CreateComment(userID int, ownerID int, photoID int, comment
 		CommentID:  lastCommentID + 1,
 		User:       user,
 		PhotoID:    photoID,
-		OwnerID:    ownerID,
 		Lyric:      commentText,
 		Created_At: time.Now(),
 	}

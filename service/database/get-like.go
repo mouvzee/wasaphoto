@@ -1,10 +1,10 @@
 package database
 
-var getLikeQUERY = "SELECT userID FROM Like WHERE PhotoID=? AND creatorID=? LIMIT ?,?"
+var getLikeQUERY = `SELECT userID FROM Like WHERE PhotoID=?`
 
-func (db *appdbimpl) GetLike(PhotoID, creatorID, offset, limit int) ([]User, error) {
+func (db *appdbimpl) GetLike(PhotoID int) ([]User, error) {
 	var l []User
-	lines, err := db.c.Query(getLikeQUERY, PhotoID, creatorID, offset, limit)
+	lines, err := db.c.Query(getLikeQUERY, PhotoID)
 	if err != nil {
 		return nil, err
 	}

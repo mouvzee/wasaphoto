@@ -15,7 +15,7 @@ It return the profile of the user with the given profileUserID
 */
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the user ID from the URL
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return

@@ -10,7 +10,6 @@ import (
 type Comment struct {
 	CommentID  int
 	photoID    int
-	ownerID	   int
 	User       User
 	Lyric      string
 	Created_At time.Time

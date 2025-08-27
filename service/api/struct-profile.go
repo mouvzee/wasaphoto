@@ -4,9 +4,9 @@ import "github.com/mouvzee/wasaphoto/service/database"
 
 type Profile struct {
 	User       User		
-	Name       string
 	Follower   int
 	Following  int
+	PostsCount int
 	IsFollowed bool
 }
 
@@ -20,7 +20,7 @@ func (p *Profile) takingProfile(dbProfile database.Profile) error {
 	p.User = u
 	p.Follower = dbProfile.Follower
 	p.Following = dbProfile.Following
-	p.Name = dbProfile.Name
+	p.PostsCount = dbProfile.PostsCount
 	p.IsFollowed = dbProfile.IsFollowed
 
 	if dbProfile.IsFollowed {

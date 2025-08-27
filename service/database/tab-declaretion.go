@@ -2,20 +2,20 @@ package database
 
 var user_table = `CREATE TABLE IF NOT EXISTS User
 				(
-					userID INTEGER AUTO_INCREMENT,
-					username INTEGER NOT NULL,
-					PRIMARY KEY(userID)
+					userID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+					username TEXT NOT NULL UNIQUE CHECK (LENGTH(username) >= 3 AND LENGTH(username) <= 13)
 				);`
 
 var post_table = `CREATE TABLE IF NOT EXISTS Post
 				(
-					PhotoID INTEGER NOT NULL,
+					PhotoID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 					userID INTEGER NOT NULL,
-					caption TEXT,
-					created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-					PRIMARY KEY(PhotoID, userID),
+					image BLOB NOT NULL,
+					caption TEXT NOT NULL,
+					created_at TEXT NOT NULL,
 					CONSTRAINT fk_post
-						FOREIGN KEY(userID) REFERENCES user(userID) ON DELETE CASCADE
+						FOREIGN KEY(userID) REFERENCES user(userID) 
+						ON DELETE CASCADE
 				);`
 
 // like, comment, follow, ban
@@ -23,27 +23,22 @@ var like_table = `CREATE TABLE IF NOT EXISTS Like
 				(
 					userID INTEGER NOT NULL,
 					PhotoID INTEGER NOT NULL,
-					creatorID INTEGER NOT NULL,
-					created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-					PRIMARY KEY(userID, PhotoID, creatorID),
+					PRIMARY KEY(userID, PhotoID),
 					CONSTRAINT fk_like
 						FOREIGN KEY(userID) REFERENCES user(userID) ON DELETE CASCADE,
-						FOREIGN KEY(PhotoID, creatorID) REFERENCES post(PhotoID,userID)
+						FOREIGN KEY(PhotoID) REFERENCES post(PhotoID) ON DELETE CASCADE
 				);`
 
 var comment_table = `CREATE TABLE IF NOT EXISTS Comment
 				(
+					commentID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 					userID INTEGER NOT NULL,
-					commentID INTEGER NOT NULL,
 					textComment TEXT NOT NULL,
 					PhotoID INTEGER NOT NULL,
-					creatorID INTEGER NOT NULL,
-					hidden BOOLEAN DEFAULT FALSE,
-					created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-					PRIMARY KEY(commentID, creatorID, PhotoID),
+					created_at TEXT NOT NULL,
 					CONSTRAINT fk_comment
 						FOREIGN KEY(userID) REFERENCES user(userID) ON DELETE CASCADE,
-						FOREIGN KEY(creatorID, PhotoID) REFERENCES post(userID, PhotoID)
+						FOREIGN KEY(PhotoID) REFERENCES post(PhotoID) ON DELETE CASCADE
 				);`
 
 var follow_table = `CREATE TABLE IF NOT EXISTS Follow
@@ -52,8 +47,8 @@ var follow_table = `CREATE TABLE IF NOT EXISTS Follow
 					followedID INTEGER NOT NULL,
 					PRIMARY KEY(followerID, followedID),
 					CONSTRAINT fk_follow
-						FOREIGN KEY(followerID) REFERENCES user(userID),
-						FOREIGN KEY(followedID) REFERENCES user(userID)
+						FOREIGN KEY(followerID) REFERENCES user(userID) ON DELETE CASCADE,
+						FOREIGN KEY(followedID) REFERENCES user(userID) ON DELETE CASCADE
 				);`
 
 var ban_table = `CREATE TABLE IF NOT EXISTS Ban
@@ -62,6 +57,6 @@ var ban_table = `CREATE TABLE IF NOT EXISTS Ban
 					bannedID INTEGER NOT NULL,
 					PRIMARY KEY(bannerID, bannedID),
 					CONSTRAINT fk_ban
-						FOREIGN KEY(bannerID) REFERENCES user(userID),
-						FOREIGN KEY(bannedID) REFERENCES user(userID)
+						FOREIGN KEY(bannerID) REFERENCES user(userID) ON DELETE CASCADE,
+						FOREIGN KEY(bannedID) REFERENCES user(userID) ON DELETE CASCADE
 				);`

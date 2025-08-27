@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/mouvzee/wasaphoto/service/api/methods"
 	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
 
@@ -17,7 +16,7 @@ It return the list of the users that the profileUserID has banned
 
 func (rt *_router) getBannedList(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID and targetUserID from the URL
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
@@ -31,15 +30,8 @@ func (rt *_router) getBannedList(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	// Get limit and offset from the queries
-	limit, offset, err := methods.GetLimitAndOffset(r.URL.Query())
-	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
-		return
-	}
-
 	// Get the bans from the database
-	dbBans, err := rt.db.GetBan(profileUserID, offset, limit)
+	dbBans, err := rt.db.GetBan(profileUserID)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error getting bans")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

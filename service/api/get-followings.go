@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/mouvzee/wasaphoto/service/api/methods"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
@@ -17,20 +15,14 @@ It returns the followings of the user with the given profileUserID
 */
 func (rt *_router) listFollowings(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID and targetUserID from the URL
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
-	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	limit, offset, err := methods.GetLimitAndOffset(r.URL.Query())
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Get the followings
-	dbFollowings, err := rt.db.GetFollowings(profileUserID, offset, limit)
+	dbFollowings, err := rt.db.GetFollowings(profileUserID)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error while getting the followings")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

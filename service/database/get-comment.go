@@ -1,10 +1,13 @@
 package database
 
-var getCommentsQUERY = `SELECT commentID, userID, creatorID, PhotoID, textComment, created_at FROM Comment WHERE creatorID = ? AND PhotoID = ? AND hidden="0" LIMIT ?,?`
+var getCommentsQUERY = `SELECT commentID, userID, PhotoID, textComment, created_at 
+							FROM Comment 
+							WHERE PhotoID = ?
+							ORDER BY created_at ASC`
 
-func (db *appdbimpl) GetComments(creatorID int, photoID int, offset int, limit int) ([]Comment, error) {
+func (db *appdbimpl) GetComments(photoID int) ([]Comment, error) {
 	var c []Comment
-	rows, err := db.c.Query(getCommentsQUERY, creatorID, photoID, offset, limit)
+	rows, err := db.c.Query(getCommentsQUERY, photoID)
 	if err != nil {
 		return nil, err
 	}

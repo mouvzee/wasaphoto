@@ -15,7 +15,7 @@ likePhoto is the handler for the POST /users/:profileUserID/posts/:PhotoID/like 
 It adds a like to the post with the given ID.
 */
 func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
@@ -41,7 +41,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	err = rt.db.CreateLike(userID, profileUserID, PhotoID)
+	err = rt.db.CreateLike(userID, PhotoID)
 	if err != nil {
 		var sqlite3Err sqlite3.Error
 		if errors.As(err, &sqlite3Err) {

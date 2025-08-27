@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/mouvzee/wasaphoto/service/api/methods"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mouvzee/wasaphoto/service/api/methods"
 	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
 
@@ -16,7 +16,7 @@ It returns the stream of the user with the given profileUserID
 */
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID from the URL
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return

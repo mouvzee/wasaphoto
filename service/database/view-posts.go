@@ -1,12 +1,14 @@
 package database
 
-var getPostsQUERY = `SELECT PhotoID, userID, caption, timestamp FROM Post WHERE userID=? ORDER BY timestamp DESC LIMIT ?, ?`
+import "time"
+
+var getPostsQUERY = `SELECT PhotoID, userID, caption, created_at FROM Post WHERE userID=? ORDER BY created_at DESC`
 var getlikeQUERY = `SELECT COUNT(PhotoID) FROM Like WHERE PhotoID=? AND userID=?`
 var getCommentQUERY = `SELECT COUNT(PhotoID) FROM Comment WHERE PhotoID=? AND userID=?`
-var statusPhotoQUERY = `SELECT COUNT(PhotoID) FROM Like WHERE userID=? AND PhotoID=? AND creatorID=?`
+var statusPhotoQUERY = `SELECT COUNT(PhotoID) FROM Like WHERE userID=? AND PhotoID=?`
 
-func (db *appdbimpl) ViewPosts(userID, offset, limit int) ([]Photo, error) {
-	lines, err := db.c.Query(getPostsQUERY, userID, offset, limit)
+func (db *appdbimpl) ViewPosts(userID int) ([]Photo, error) {
+	lines, err := db.c.Query(getPostsQUERY, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -20,9 +22,16 @@ func (db *appdbimpl) ViewPosts(userID, offset, limit int) ([]Photo, error) {
 		}
 		var photo Photo
 		var u User
+		var createdAtStr string 
 
 		//information about the photo
-		err = lines.Scan(&photo.PhotoID, &u.UserID, &photo.Caption, &photo.Created_At)
+		err = lines.Scan(&photo.PhotoID, &u.UserID, &photo.Caption, &createdAtStr)
+		if err != nil {
+			return nil, err
+		}
+
+		// parsing timestamp
+		photo.Created_At, err = time.Parse("2006-01-02 15:04:05", createdAtStr)
 		if err != nil {
 			return nil, err
 		}
@@ -41,7 +50,7 @@ func (db *appdbimpl) ViewPosts(userID, offset, limit int) ([]Photo, error) {
 
 		//check status photo between liked or not
 		var check int
-		err = db.c.QueryRow(statusPhotoQUERY, userID, photo.PhotoID, u.UserID).Scan(&check)
+		err = db.c.QueryRow(statusPhotoQUERY, userID, photo.PhotoID).Scan(&check)
 		if err != nil {
 			return nil, err
 		}
@@ -58,9 +67,6 @@ func (db *appdbimpl) ViewPosts(userID, offset, limit int) ([]Photo, error) {
 		}
 
 		photo.User = user
-
-		//get path for the URL
-		photo.URL = GetPhotoPath(photo.PhotoID, photo.User.UserID)
 
 		photos = append(photos, photo)
 	}

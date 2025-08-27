@@ -5,12 +5,12 @@ import (
 	"errors"
 )
 
-var query_GETLASTCOMMENTID = `SELECT MAX(commentID) FROM Comment WHERE ownerID=? AND PhotoID=?;`
+var query_GETLASTCOMMENTID = `SELECT MAX(commentID) FROM Comment WHERE PhotoID=?;`
 
-func (db *appdbimpl) GetLastCommentID(ownerID int, PhotoID int) (int, error) {
+func (db *appdbimpl) GetLastCommentID(PhotoID int) (int, error) {
 	_lastCommentID := sql.NullInt64{Int64: 0, Valid: false}
 	var lastCommentID int = 0
-	rows, err := db.c.Query(query_GETLASTCOMMENTID, ownerID, PhotoID)
+	rows, err := db.c.Query(query_GETLASTCOMMENTID, PhotoID)
 	if err != nil {
 		return 0, err
 	}

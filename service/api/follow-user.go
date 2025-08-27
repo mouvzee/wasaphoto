@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
 
 /*
@@ -20,7 +20,7 @@ DA RIVEDERE
 */
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID and targetUserID from the URL
-	profileUserID, err := strconv.Atoi(ps.ByName("profileUserID"))
+	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
