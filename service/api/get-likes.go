@@ -23,7 +23,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	PhotoID, err := strconv.Atoi(ps.ByName("PhotoID"))
+	photoID, err := strconv.Atoi(ps.ByName("photoID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
@@ -42,7 +42,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	dbLikes, err := rt.db.GetLike(PhotoID)
+	dbLikes, err := rt.db.GetLike(photoID)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error getting likes")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

@@ -21,6 +21,22 @@ func (rt *_router) listFollowings(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
+	userID := ctx.UserID
+
+	// Check if the user is banned 
+	if profileUserID != userID {
+		isBanned, err := rt.db.IsBanned(profileUserID, userID)
+		if err != nil {
+			ctx.Logger.WithError(err).Error("Error checking if user is banned")
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		if isBanned {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+	}
+
 	// Get the followings
 	dbFollowings, err := rt.db.GetFollowings(profileUserID)
 	if err != nil {

@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/mouvzee/wasaphoto/service/api/methods"
 	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 )
 
@@ -22,28 +21,23 @@ func (rt *_router) getUserPhotos(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
-	// Get the offset and limit from the query
-	limit, offset, err := methods.GetLimitAndOffset(r.URL.Query())
-	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
-		return
-	}
-
 	userID := ctx.UserID
 
-	isBanned, err := rt.db.IsBanned(userID, profileUserID)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("Error checking if the user is banned")
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	if isBanned {
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
+	if profileUserID != userID {
+		isBanned, err := rt.db.IsBanned(profileUserID, userID)
+		if err != nil {
+			ctx.Logger.WithError(err).Error("Error checking if user is banned")
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		if isBanned {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
 	}
 
 	// Get the posts from the database
-	dbPosts, err := rt.db.GetPosts(userID, profileUserID, offset, limit)
+	dbPosts, err := rt.db.GetPosts(profileUserID, userID)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error getting posts")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

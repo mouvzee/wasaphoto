@@ -14,7 +14,7 @@ var post_table = `CREATE TABLE IF NOT EXISTS Post
 					caption TEXT NOT NULL,
 					created_at TEXT NOT NULL,
 					CONSTRAINT fk_post
-						FOREIGN KEY(userID) REFERENCES user(userID) 
+						FOREIGN KEY(userID) REFERENCES User(userID) 
 						ON DELETE CASCADE
 				);`
 
@@ -25,8 +25,8 @@ var like_table = `CREATE TABLE IF NOT EXISTS Like
 					PhotoID INTEGER NOT NULL,
 					PRIMARY KEY(userID, PhotoID),
 					CONSTRAINT fk_like
-						FOREIGN KEY(userID) REFERENCES user(userID) ON DELETE CASCADE,
-						FOREIGN KEY(PhotoID) REFERENCES post(PhotoID) ON DELETE CASCADE
+						FOREIGN KEY(userID) REFERENCES User(userID) ON DELETE CASCADE,
+						FOREIGN KEY(PhotoID) REFERENCES Post(PhotoID) ON DELETE CASCADE
 				);`
 
 var comment_table = `CREATE TABLE IF NOT EXISTS Comment
@@ -37,8 +37,8 @@ var comment_table = `CREATE TABLE IF NOT EXISTS Comment
 					PhotoID INTEGER NOT NULL,
 					created_at TEXT NOT NULL,
 					CONSTRAINT fk_comment
-						FOREIGN KEY(userID) REFERENCES user(userID) ON DELETE CASCADE,
-						FOREIGN KEY(PhotoID) REFERENCES post(PhotoID) ON DELETE CASCADE
+						FOREIGN KEY(userID) REFERENCES User(userID) ON DELETE CASCADE,
+						FOREIGN KEY(PhotoID) REFERENCES Post(PhotoID) ON DELETE CASCADE
 				);`
 
 var follow_table = `CREATE TABLE IF NOT EXISTS Follow
@@ -47,8 +47,8 @@ var follow_table = `CREATE TABLE IF NOT EXISTS Follow
 					followedID INTEGER NOT NULL,
 					PRIMARY KEY(followerID, followedID),
 					CONSTRAINT fk_follow
-						FOREIGN KEY(followerID) REFERENCES user(userID) ON DELETE CASCADE,
-						FOREIGN KEY(followedID) REFERENCES user(userID) ON DELETE CASCADE
+						FOREIGN KEY(followerID) REFERENCES User(userID) ON DELETE CASCADE,
+						FOREIGN KEY(followedID) REFERENCES User(userID) ON DELETE CASCADE
 				);`
 
 var ban_table = `CREATE TABLE IF NOT EXISTS Ban
@@ -57,6 +57,6 @@ var ban_table = `CREATE TABLE IF NOT EXISTS Ban
 					bannedID INTEGER NOT NULL,
 					PRIMARY KEY(bannerID, bannedID),
 					CONSTRAINT fk_ban
-						FOREIGN KEY(bannerID) REFERENCES user(userID) ON DELETE CASCADE,
-						FOREIGN KEY(bannedID) REFERENCES user(userID) ON DELETE CASCADE
+						FOREIGN KEY(bannerID) REFERENCES User(userID) ON DELETE CASCADE,
+						FOREIGN KEY(bannedID) REFERENCES User(userID) ON DELETE CASCADE
 				);`

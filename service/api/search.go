@@ -10,25 +10,25 @@ import (
 )
 
 /*
-searchUsers is the handler for the GET /users/search endpoint
+searchUsers is the handler for the GET /profiles?search=query endpoint
 It returns the users that match the given search query
 */
 func (rt *_router) searchUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the search query from the request
 	query_search := r.URL.Query().Get("search")
-	validQuerySearch := regexp.MustCompile(`^[a-z0-9]{1,13}$`)
-	if !validQuerySearch.MatchString(query_search) {
-		http.Error(w, "Bad Request", http.StatusBadRequest)
+
+	validQuerySearch := regexp.MustCompile(`^[a-zA-Z0-9_-]{1,13}$`)
+	if query_search == "" || !validQuerySearch.MatchString(query_search) {
+		http.Error(w, "Bad Request: invalid search query", http.StatusBadRequest)
 		return
 	}
 
 	userID := ctx.UserID
 
-
 	dbUsers, err := rt.db.SearchUsers(userID, query_search)
 	if err != nil {
-		ctx.Logger.Error("Error searching users ", err)
-		http.Error(w, "Error searching users", http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("Error searching users")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -37,20 +37,19 @@ func (rt *_router) searchUsers(w http.ResponseWriter, r *http.Request, ps httpro
 		var user User
 		err := user.TakeUser(u)
 		if err != nil {
-			ctx.Logger.Error("Error converting users ", err)
-			http.Error(w, "Error converting users ", http.StatusInternalServerError)
+			ctx.Logger.WithError(err).Error("Error converting users")
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		users[i] = user
 	}
 
 	// Write the response
-	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(users); err != nil {
-		ctx.Logger.Error("Error encoding users ", err)
-		http.Error(w, "Error encoding response ", http.StatusInternalServerError)
+		ctx.Logger.WithError(err).Error("Error encoding users")
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
 }

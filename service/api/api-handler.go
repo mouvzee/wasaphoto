@@ -6,61 +6,61 @@ import (
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
-	// -------LOGIN AND REGISTER--------//
+	// -------LOGIN AND REGISTER--------Done//
 	rt.router.POST("/login", rt.wrap(rt.doLogin, false))
-	
-	// --------GET USER PROFILE----------//
+
+	// --------GET USER PROFILE----------Done//
 	rt.router.GET("/profiles/:userID", rt.wrap(rt.getUserProfile, true))
 
-	// --------CHANGE USERNAME---------//
+	// --------CHANGE USERNAME---------Done//
 	rt.router.PUT("/profiles/:userID/username", rt.wrap(rt.setMyUserName, true))
 
-	// ----------FOLLOW USER-----------//
+	// ----------FOLLOW USER-----------Done//
 	rt.router.PUT("/profiles/:userID/followings/:targetUserID", rt.wrap(rt.followUser, true))
 
-	// --------UNFOLLOW USER-----------//
+	// --------UNFOLLOW USER-----------Done//
 	rt.router.DELETE("/profiles/:userID/followings/:targetUserID", rt.wrap(rt.unfollowUser, true))
 
-	// ----------GET FOLLOWINGS--------//
+	// ----------GET FOLLOWINGS--------Done//
 	rt.router.GET("/profiles/:userID/followings", rt.wrap(rt.listFollowings, true))
 
-	// ----------GET FOLLOWERS---------//
+	// ----------GET FOLLOWERS---------Done//
 	rt.router.GET("/profiles/:userID/followers", rt.wrap(rt.listFollowers, true))
 
-	// ----------BAN USER--------------//
+	// ----------BAN USER--------------Done//
 	rt.router.PUT("/profiles/:userID/bans/:targetUserID", rt.wrap(rt.banUser, true))
 
-	// --------UNBAN USER--------------//
+	// --------UNBAN USER--------------Done//
 	rt.router.DELETE("/profiles/:userID/bans/:targetUserID", rt.wrap(rt.unbanUser, true))
 
-	// -----------GET BANS------------//
+	// -----------GET BANS------------Done//
 	rt.router.GET("/profiles/:userID/bans", rt.wrap(rt.getBannedList, true))
 
-	// ----------UPLOAD POST----------//
+	// ----------UPLOAD POST----------Done//
 	rt.router.POST("/profiles/:userID/posts", rt.wrap(rt.uploadPhoto, true))
 
-	// ----------GET POSTS------------//
+	// ----------GET POSTS------------Done//
 	rt.router.GET("/profiles/:userID/posts", rt.wrap(rt.getUserPhotos, true))
 
-	// ----------DELETE POST-----------//
+	// ----------DELETE POST-----------Done//
 	rt.router.DELETE("/profiles/:userID/posts/:photoID", rt.wrap(rt.deletePhoto, true))
 
-	// ----------LIKE POST-------------//
-	rt.router.PUT("/profiles/:userID/posts/:photoID/likes/:likeID", rt.wrap(rt.likePhoto, true))
+	// ----------LIKE POST-------------Done//
+	rt.router.PUT("/profiles/:userID/posts/:photoID/likes", rt.wrap(rt.likePhoto, true))
 
-	// --------UNLIKE POST-------------//
+	// --------UNLIKE POST-------------Done//
 	rt.router.DELETE("/profiles/:userID/posts/:photoID/likes/:likeID", rt.wrap(rt.unlikePhoto, true))
 
-	// ---------GET LIKES--------------//
+	// ---------GET LIKES--------------Done//
 	rt.router.GET("/profiles/:userID/posts/:photoID/likes", rt.wrap(rt.getLikes, true))
 
-	// ----------COMMENT POST----------//
+	// ----------COMMENT POST----------Done//
 	rt.router.POST("/profiles/:userID/posts/:photoID/comments", rt.wrap(rt.commentPhoto, true))
 
-	// ----------UNCOMMENT POST--------//
+	// ----------UNCOMMENT POST--------Done//
 	rt.router.DELETE("/profiles/:userID/posts/:photoID/comments/:commentID", rt.wrap(rt.uncommentPhoto, true))
 
-	// ---------GET COMMENTS-----------//
+	// ---------GET COMMENTS-----------Done//
 	rt.router.GET("/profiles/:userID/posts/:photoID/comments", rt.wrap(rt.getComments, true))
 
 	// ---------GET FEED--------------//

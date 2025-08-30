@@ -22,7 +22,7 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	// Get the PhotoID from the URL
-	PhotoID, err := strconv.Atoi(ps.ByName("PhotoID"))
+	photoID, err := strconv.Atoi(ps.ByName("photoID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
@@ -31,19 +31,21 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	userID := ctx.UserID
 
 	// Check if the user is banned
-	isBanned, err := rt.db.IsBanned(profileUserID, userID)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("Error checking if user is banned")
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	if isBanned {
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
+	if profileUserID != userID {
+		isBanned, err := rt.db.IsBanned(profileUserID, userID)
+		if err != nil {
+			ctx.Logger.WithError(err).Error("Error checking if user is banned")
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		if isBanned {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
 	}
 
 	// Get the comments
-	dbComments, err := rt.db.GetComments(PhotoID)
+	dbComments, err := rt.db.GetComments(photoID)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error getting comments")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

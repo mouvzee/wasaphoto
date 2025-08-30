@@ -23,7 +23,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	PhotoID, err := strconv.Atoi(ps.ByName("PhotoID"))
+	photoID, err := strconv.Atoi(ps.ByName("photoID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
@@ -43,7 +43,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	// Delete the comment
-	err = rt.db.DeleteComment(commentID, PhotoID)
+	err = rt.db.DeleteComment(commentID, photoID)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error uncommenting photo")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

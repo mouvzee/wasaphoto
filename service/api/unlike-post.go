@@ -22,13 +22,13 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	PhotoID, err := strconv.Atoi(ps.ByName("PhotoID"))
+	PhotoID, err := strconv.Atoi(ps.ByName("photoID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	targetUserID, err := strconv.Atoi(ps.ByName("userID"))
+	targetUserID, err := strconv.Atoi(ps.ByName("likeID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return

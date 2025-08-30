@@ -14,33 +14,37 @@ It deletes a photo from the database and returns a 200 OK if the photo is delete
 */
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the user ID from the URL
-	UserID, err := strconv.Atoi(ps.ByName("UserID"))
+	userID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// Get the post ID from the URL
-	PhotoID, err := strconv.Atoi(ps.ByName("PhotoID"))
+	photoID, err := strconv.Atoi(ps.ByName("photoID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
+	}
+	// Print all parameters in ps
+	for i := 0; i < len(ps); i++ {
+		ctx.Logger.Infof("Param %s: %s", ps[i].Key, ps[i].Value)
 	}
 
-	Token, err := strconv.Atoi(ps.ByName("Token"))
-	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
-		return
-	}
+	// token, err := strconv.Atoi(ps.ByName("Token"))
+	// if err != nil {
+	// 	http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
+	// 	return
+	// }
 
 	// Check if the user is authorized
-	if UserID != Token {
+	if userID != ctx.UserID {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 
 	// Delete the photo from the database
-	if err := rt.db.Delete_Photo(UserID, PhotoID); err != nil {
+	if err := rt.db.Delete_Photo(photoID); err != nil {
 		ctx.Logger.WithError(err).Error("Error while deleting the post")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return

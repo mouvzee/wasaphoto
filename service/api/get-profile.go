@@ -24,15 +24,17 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	userID := ctx.UserID
 
 	// Check if the user is banned
-	isBanned, err := rt.db.IsBanned(profileUserID, userID)
-	if err != nil {
-		ctx.Logger.WithError(err).Error("Error while checking if the user is banned")
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-	if isBanned {
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
+	if profileUserID != userID {
+		isBanned, err := rt.db.IsBanned(profileUserID, userID)
+		if err != nil {
+			ctx.Logger.WithError(err).Error("Error while checking if the user is banned")
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		if isBanned {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
 	}
 
 	// Get the user from the database

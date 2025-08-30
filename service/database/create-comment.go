@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var query_CREATECOMMENT = `INSERT INTO Comment (commentID, userID, PhotoID, commentText) VALUES (?, ?, ?, ?);`
+var query_CREATECOMMENT = `INSERT INTO Comment (commentID, userID, textComment, PhotoID, created_at) VALUES (?, ?, ?, ?, datetime('now'));`
 
 func (db *appdbimpl) CreateComment(userID int, photoID int, commentText string) (Comment, error) {
 	var comment Comment
@@ -25,13 +25,13 @@ func (db *appdbimpl) CreateComment(userID int, photoID int, commentText string) 
 
 	defer func() {
 		if err != nil {
-			err = tx.Rollback()
+			_ = tx.Rollback()
+		} else {
+			_ = tx.Commit()
 		}
-		err = tx.Commit()
 	}()
 
-	// Create the comment
-	_, err = tx.Exec(query_CREATECOMMENT, lastCommentID+1, userID, photoID, commentText)
+	_, err = tx.Exec(query_CREATECOMMENT, lastCommentID+1, userID, commentText, photoID)
 	if err != nil {
 		return comment, err
 	}
@@ -46,7 +46,7 @@ func (db *appdbimpl) CreateComment(userID int, photoID int, commentText string) 
 		User:       user,
 		PhotoID:    photoID,
 		Lyric:      commentText,
-		Created_At: time.Now(),
+		Created_At: time.Now(), 
 	}
 
 	return comment, err

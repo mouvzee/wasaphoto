@@ -35,13 +35,13 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	PhotoID, err := strconv.Atoi(ps.ByName("PhotoID"))
+	photoID, err := strconv.Atoi(ps.ByName("photoID"))
 	if err != nil {
 		http.Error(w, "Bad Request "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = rt.db.CreateLike(userID, PhotoID)
+	err = rt.db.CreateLike(userID, photoID)
 	if err != nil {
 		var sqlite3Err sqlite3.Error
 		if errors.As(err, &sqlite3Err) {

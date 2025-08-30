@@ -4,19 +4,21 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var query_GETUSERS = `SELECT userID, username FROM User WHERE username regexp ? ORDER BY username `
+var query_GETUSERS = `SELECT userID, username FROM User WHERE username LIKE ? ORDER BY username`
 
 func (db *appdbimpl) SearchUsers(userID int, search string) ([]User, error) {
 	var users []User
 
-	rows, err := db.c.Query(query_GETUSERS, "^"+search)
+	rows, err := db.c.Query(query_GETUSERS, search+"%")
 	if err != nil {
 		return nil, err
 	}
 
+	defer func() { _ = rows.Close() }()
+
 	for rows.Next() {
 		if rows.Err() != nil {
-			return nil, err
+			return nil, rows.Err()
 		}
 
 		var u User
@@ -24,16 +26,15 @@ func (db *appdbimpl) SearchUsers(userID int, search string) ([]User, error) {
 			return nil, err
 		}
 
-		isBanned, err := db.IsBanned(userID, u.UserID)
+		isBanned, err := db.IsBanned(u.UserID, userID)
 		if err != nil {
 			return nil, err
 		}
+
 		if !isBanned {
 			users = append(users, u)
-
 		}
 	}
-	defer func() { err = rows.Close() }()
 
-	return users, err
+	return users, nil 
 }

@@ -1,14 +1,26 @@
 package database
 
-var join_FOLLOWINGS_POSTS = `SELECT User.userID, User.username, Post.PhotoID, Post.caption, Post.created_at 
-							FROM (` + union_FOLLOWINGS_ME + `) AS User INNER JOIN Post ON User.userID = Post.userID ORDER BY Post.created_at DESC LIMIT ?, ?`
-var union_FOLLOWINGS_ME = getFollowingsQUERY + ` UNION SELECT userID, username FROM User WHERE userID=?`
+import "time"
 
-func (db *appdbimpl) GetStream(userID int, offeset int, limit int) ([]Photo, error) {
+
+var getStreamQUERY = `SELECT u.userID, u.username, p.PhotoID, p.image, p.caption, p.created_at 
+                        FROM Post p 
+                        JOIN User u ON p.userID = u.userID 
+                        JOIN Follow f ON p.userID = f.followedID 
+                        WHERE f.followerID = ? 
+                        AND p.userID NOT IN (SELECT bannerID FROM Ban WHERE bannedID = ?) 
+                        ORDER BY p.created_at DESC 
+                        LIMIT ? OFFSET ?`
+
+var query_GETLIKECOUNT_STREAM = `SELECT COUNT(*) FROM Like WHERE PhotoID = ?`
+var query_GETCOMMENTCOUNT_STREAM = `SELECT COUNT(*) FROM Comment WHERE PhotoID = ?`
+var query_ISLIKED_STREAM = `SELECT COUNT(*) FROM Like WHERE PhotoID = ? AND userID = ?`
+
+func (db *appdbimpl) GetStream(userID int, offset int, limit int) ([]Photo, error) {
 	var posts []Photo
 
 	// Get the posts from the database
-	res, err := db.c.Query(join_FOLLOWINGS_POSTS, userID, 0, -1, userID, offeset, limit)
+	res, err := db.c.Query(getStreamQUERY, userID, userID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -20,34 +32,38 @@ func (db *appdbimpl) GetStream(userID int, offeset int, limit int) ([]Photo, err
 		}
 		var user User
 		var post Photo
+		var createdAtStr string
 
-		// Scan the result into the post struct
-		if err := res.Scan(&user.UserID, &user.Username, &post.PhotoID, &post.Caption, &post.Created_At); err != nil {
-			return nil, err
-		}
-
-		// Get the likes count for the post
-		if err := db.c.QueryRow(query_GETLIKECOUNT, post.PhotoID, user.UserID).Scan(&post.Nlike); err != nil {
-			return nil, err
-		}
-
-		// Get the comments count for the post
-		if err := db.c.QueryRow(query_GETCOMMENTCOUNT, post.PhotoID, user.UserID).Scan(&post.Ncomment); err != nil {
-			return nil, err
-		}
-
-		// Get like status
-		var like int
-		err = db.c.QueryRow(query_ISLIKED, post.PhotoID, user.UserID, userID).Scan(&like)
+		err := res.Scan(&user.UserID, &user.Username, &post.PhotoID, &post.ImageData, &post.Caption, &createdAtStr)
 		if err != nil {
 			return nil, err
 		}
 
-		if like == 1 {
-			post.Liked = true
-		} else {
-			post.Liked = false
+		// Parse del timestamp
+		post.Created_At, err = time.Parse("2006-01-02 15:04:05", createdAtStr)
+		if err != nil {
+			return nil, err
 		}
+
+		// Get the likes count for the post
+		err = db.c.QueryRow(query_GETLIKECOUNT_STREAM, post.PhotoID).Scan(&post.Nlike)
+		if err != nil {
+			return nil, err
+		}
+
+		// Get the comments count for the post
+		err = db.c.QueryRow(query_GETCOMMENTCOUNT_STREAM, post.PhotoID).Scan(&post.Ncomment)
+		if err != nil {
+			return nil, err
+		}
+
+		// Get like status
+		var likeCount int
+		err = db.c.QueryRow(query_ISLIKED_STREAM, post.PhotoID, userID).Scan(&likeCount)
+		if err != nil {
+			return nil, err
+		}
+		post.Liked = likeCount > 0
 
 		// Set the user data
 		post.User = user

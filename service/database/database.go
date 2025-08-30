@@ -70,9 +70,9 @@ type AppDatabase interface {
 	//Get the ID of the last photo uploaded
 	GetLastPhotoID(userID int) (int, error)
 	//Delete a photo in the user profile
-	Delete_Photo(UserID int, PhotoID int) error
+	Delete_Photo(PhotoID int) error
 	//get the photos
-	GetPosts(userID int, profileUserID int, offset int, limit int) ([]Photo, error)
+	GetPosts(profileUserID int, requestingUserID int) ([]Photo, error)
 
 	//COMMENT
 

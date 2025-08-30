@@ -1,5 +1,7 @@
 package database
 
+import "time"
+
 var getCommentsQUERY = `SELECT commentID, userID, PhotoID, textComment, created_at 
 							FROM Comment 
 							WHERE PhotoID = ?
@@ -19,12 +21,19 @@ func (db *appdbimpl) GetComments(photoID int) ([]Comment, error) {
 			return nil, err
 		}
 		var comment Comment
-		var userID int
-		err = rows.Scan(&comment.CommentID, &userID, &comment.User.UserID, &comment.PhotoID, &comment.Lyric, &comment.Created_At)
+		var createdAtStr string
+
+		err = rows.Scan(&comment.CommentID, &comment.User.UserID, &comment.PhotoID, &comment.Lyric, &createdAtStr)
 		if err != nil {
 			return nil, err
 		}
-		user, err := db.CheckID(userID)
+
+		comment.Created_At, err = time.Parse("2006-01-02 15:04:05", createdAtStr)
+		if err != nil {
+			return nil, err
+		}
+
+		user, err := db.CheckID(comment.User.UserID)
 		if err != nil {
 			return nil, err
 		}
