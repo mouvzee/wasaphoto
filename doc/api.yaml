@@ -341,7 +341,7 @@ paths:
                     description: The list of photos posted by the user
                     type: array
                     items:
-                      $ref: "#/components/schemas/Post"
+                      $ref: "#/components/schemas/Photo"
                     minItems: 0
                     maxItems: 50
         "400":
