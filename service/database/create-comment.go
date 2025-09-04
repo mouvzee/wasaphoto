@@ -46,7 +46,7 @@ func (db *appdbimpl) CreateComment(userID int, photoID int, commentText string) 
 		User:       user,
 		PhotoID:    photoID,
 		Lyric:      commentText,
-		Created_At: time.Now(), 
+		Created_At: time.Now(),
 	}
 
 	return comment, err

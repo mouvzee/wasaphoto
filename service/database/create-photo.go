@@ -33,9 +33,8 @@ func (db *appdbimpl) CreatePhoto(y Photo, ImageData []byte) (Photo, error) {
 
 	y.PhotoID = int(photoID)
 
-
 	y.ImageData = ImageData
-	y.Created_At = time.Now() 
+	y.Created_At = time.Now()
 	y.Nlike = 0
 	y.Ncomment = 0
 	y.Liked = false

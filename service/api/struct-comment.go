@@ -15,7 +15,7 @@ type Comment struct {
 	Created_At time.Time
 }
 
-//check that the comment is from a certain user and save the information from database
+// check that the comment is from a certain user and save the information from database
 func (c *Comment) takingComment(dbComment database.Comment) error {
 	var u User
 	err := u.TakeUser(dbComment.User)

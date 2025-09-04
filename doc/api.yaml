@@ -8,8 +8,6 @@ info:
 tags:
 - name: Login
   description: Everything about login
-- name: Username
-  description: Everything about username
 - name: Photo
   description: Everything about photos
 - name: User
@@ -377,25 +375,7 @@ paths:
     parameters:
       - $ref: "#/components/parameters/userID"
       - $ref: "#/components/parameters/photoID"
-      - $ref: "#/components/parameters/targetUserID"
-    put:
-      summary: Like a post
-      tags: [ "Posts" ]
-      operationId: likePhoto
-      description: Like the post with the given photoID.
-      responses:
-        "200":  
-          $ref: "#/components/responses/Success" 
-        "201":
-          $ref: "#/components/responses/Created"
-        "400":  
-          $ref: "#/components/responses/BadRequest" 
-        "401":  
-          $ref: "#/components/responses/Unauthorized" 
-        "403":  
-          $ref: "#/components/responses/Forbidden" 
-        "500":  
-          $ref: "#/components/responses/InternalServerError" 
+      - $ref: "#/components/parameters/likeID"
     delete:
       summary: Unlike a post
       tags: [ "Posts" ]
@@ -444,6 +424,24 @@ paths:
         "403":
           $ref: "#/components/responses/Forbidden" 
         "500":
+          $ref: "#/components/responses/InternalServerError" 
+    put:
+      summary: Like a post
+      tags: [ "Posts" ]
+      operationId: likePhoto
+      description: Like the post with the given photoID.
+      responses:
+        "200":  
+          $ref: "#/components/responses/Success" 
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":  
+          $ref: "#/components/responses/BadRequest" 
+        "401":  
+          $ref: "#/components/responses/Unauthorized" 
+        "403":  
+          $ref: "#/components/responses/Forbidden" 
+        "500":  
           $ref: "#/components/responses/InternalServerError" 
   /profiles/{userID}/posts/{photoID}/comments:
     parameters:

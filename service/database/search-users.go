@@ -36,5 +36,5 @@ func (db *appdbimpl) SearchUsers(userID int, search string) ([]User, error) {
 		}
 	}
 
-	return users, nil 
+	return users, nil
 }

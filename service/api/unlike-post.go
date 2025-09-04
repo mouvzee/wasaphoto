@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/mouvzee/wasaphoto/service/api/reqcontext"
 	"github.com/mouvzee/wasaphoto/service/database"
-	"github.com/julienschmidt/httprouter"
 )
 
 /*

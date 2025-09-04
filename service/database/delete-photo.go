@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-
 )
 
 var DelPhoto = "DELETE FROM Post WHERE PhotoID=?"

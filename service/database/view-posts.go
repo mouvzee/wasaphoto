@@ -22,7 +22,7 @@ func (db *appdbimpl) ViewPosts(userID int) ([]Photo, error) {
 		}
 		var photo Photo
 		var u User
-		var createdAtStr string 
+		var createdAtStr string
 
 		//information about the photo
 		err = lines.Scan(&photo.PhotoID, &u.UserID, &photo.Caption, &createdAtStr)

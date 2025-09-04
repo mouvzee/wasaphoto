@@ -23,7 +23,7 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 
 	userID := ctx.UserID
 
-	// Check if the user is banned 
+	// Check if the user is banned
 	if profileUserID != userID {
 		isBanned, err := rt.db.IsBanned(profileUserID, userID)
 		if err != nil {

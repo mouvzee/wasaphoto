@@ -45,7 +45,7 @@ func (y *Photo) SavingPhoto() database.Photo {
 }
 
 func (y *Photo) TakingPhoto(dbPhoto database.Photo) error {
-	
+
 	var u User
 	err := u.TakeUser(dbPhoto.User)
 	if err != nil {
@@ -54,7 +54,7 @@ func (y *Photo) TakingPhoto(dbPhoto database.Photo) error {
 
 	y.PhotoID = dbPhoto.PhotoID
 	y.User = u
-	y.ImageData = dbPhoto.ImageData 
+	y.ImageData = dbPhoto.ImageData
 	y.Caption = dbPhoto.Caption
 	y.Nlike = dbPhoto.Nlike
 	y.Ncomment = dbPhoto.Ncomment

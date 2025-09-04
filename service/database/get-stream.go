@@ -2,7 +2,6 @@ package database
 
 import "time"
 
-
 var getStreamQUERY = `SELECT u.userID, u.username, p.PhotoID, p.image, p.caption, p.created_at 
                         FROM Post p 
                         JOIN User u ON p.userID = u.userID 

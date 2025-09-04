@@ -30,11 +30,11 @@ type Comment struct {
 }
 
 type Profile struct {
-	User       User   `json:"user"`
-	Follower   int    `json:"follower"`
-	Following  int    `json:"following"`
-	PostsCount int    `json:"postsCount"`
-	IsFollowed bool   `json:"isFollowed"`
+	User       User `json:"user"`
+	Follower   int  `json:"follower"`
+	Following  int  `json:"following"`
+	PostsCount int  `json:"postsCount"`
+	IsFollowed bool `json:"isFollowed"`
 }
 
 type Authorization struct {
