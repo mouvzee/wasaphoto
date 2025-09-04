@@ -31,12 +31,14 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	if !b {
-		_, err := rt.create_user(user)
+		createdUser, err := rt.create_user(user)
 		if err != nil {
 			ctx.Logger.WithError(err).Error("Cannot create the user")
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		// Usa l'utente creato con l'ID corretto
+		user = createdUser
 		w.WriteHeader(http.StatusCreated)
 	} else {
 		dbUser, err := rt.db.GetUserByUsername(user.Username)
