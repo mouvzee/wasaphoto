@@ -6,6 +6,9 @@ import ErrorMsg from './components/ErrorMsg.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 import ProfileHeader from './components/ProfileHeader.vue'
 import ProfileStats from './components/ProfileStats.vue'
+import PostCard from './components/PostCard.vue';
+import PostModal from './components/PostModal.vue';
+import UploadModal from './components/UploadModal.vue';
 
 import './assets/dashboard.css'
 import './assets/main.css'
@@ -16,5 +19,9 @@ app.component("ErrorMsg", ErrorMsg);
 app.component("LoadingSpinner", LoadingSpinner);
 app.component("ProfileHeader", ProfileHeader);
 app.component("ProfileStats", ProfileStats);
+app.component("PostCard", PostCard);
+app.component("PostModal", PostModal);
+app.component("UploadModal", UploadModal);
+
 app.use(router)
 app.mount('#app')

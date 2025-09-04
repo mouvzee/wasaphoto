@@ -9,7 +9,8 @@ export default {
     return {
       // Stato reattivo per l'utente corrente
       reactiveUserId: null,
-      storageCheckInterval: null
+      storageCheckInterval: null,
+      showUploadModal: false
     }
   },
   computed: {
@@ -22,7 +23,8 @@ export default {
     }
   },
   created() {
-    // Carica l'utente iniziale
+    // ✅ INIZIALIZZA il token all'avvio
+    this.initializeAuth();
     this.updateCurrentUser();
     
     // Controlla periodicamente per cambiamenti nel localStorage
@@ -43,6 +45,14 @@ export default {
     }
   },
   methods: {
+    // ✅ NUOVO: Inizializza l'autenticazione
+    initializeAuth() {
+      const token = localStorage.getItem('token');
+      if (token && token !== '0' && token !== 'null' && token !== 'undefined') {
+        setAuth(token);
+      }
+    },
+
     updateCurrentUser() {
       try {
         const userStr = localStorage.getItem('user');
@@ -61,7 +71,6 @@ export default {
         
         // Aggiorna SOLO se è cambiato
         if (this.reactiveUserId !== user.UserID) {
-          console.log('App.vue - Updating currentUserId from', this.reactiveUserId, 'to', user.UserID);
           this.reactiveUserId = user.UserID;
         }
       } catch (error) {
@@ -72,12 +81,27 @@ export default {
     
     logout() {
       localStorage.clear();
-      delete this.$axios.defaults.headers.common['Authorization'];
-      
+      setAuth(null); 
       // Forza l'aggiornamento dell'utente corrente
       this.reactiveUserId = null;
       
       window.location.href = '/#/login';
+    },
+
+    openUploadModal() {
+      this.showUploadModal = true;
+    },
+
+    closeUploadModal() {
+      this.showUploadModal = false;
+    },
+
+    onPostUploaded() {
+      this.showUploadModal = false;
+      this.$nextTick(() => {
+        // Forza il reload dei post se siamo sulla pagina del profilo
+        window.dispatchEvent(new CustomEvent('postUploaded'));
+      });
     }
   }
 }
@@ -100,6 +124,18 @@ export default {
 
           <!-- Separatore -->
           <hr class="mx-3 text-muted">
+          
+          <!-- Pulsante Upload Post -->
+          <div class="px-3 mb-3">
+            <button 
+              v-if="currentUserId"
+              class="btn btn-primary w-100 upload-btn"
+              @click="openUploadModal"
+            >
+              <i class="fas fa-plus-circle me-2"></i>
+              <span>New Post</span>
+            </button>
+          </div>
           
           <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
             <span>General</span>
@@ -148,6 +184,13 @@ export default {
     <div v-else>
       <RouterView />
     </div>
+
+    <!-- Upload Modal -->
+    <UploadModal 
+      v-if="showUploadModal"
+      @close="closeUploadModal"
+      @uploaded="onPostUploaded"
+    />
   </div>
 </template>
 
@@ -193,6 +236,24 @@ export default {
   margin-bottom: 1rem;
 }
 
+/* Pulsante Upload Post */
+.upload-btn {
+  font-weight: 600;
+  border-radius: 25px;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.upload-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+}
+
 /* Migliori stili per i nav links */
 .sidebar .nav-link {
   font-weight: 500;
@@ -222,5 +283,18 @@ export default {
   min-height: 100vh;
 }
 
-
+@media (max-width: 767.98px) {
+  .sidebar {
+    position: relative;
+    height: auto;
+  }
+  
+  .main-content {
+    padding-top: 1rem;
+  }
+  
+  .sidebar-header {
+    padding: 1rem;
+  }
+}
 </style>

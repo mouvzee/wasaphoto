@@ -19,41 +19,15 @@
 
       <!-- Sezione posts -->
       <div v-if="profile && !error" class="posts-section mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h3>Posts</h3>
-          <button 
-            v-if="isOwnProfile" 
-            class="btn btn-primary"
-            @click="createNewPost"
-          >
-            <i class="fas fa-plus"></i> New Post
-          </button>
-        </div>
 
         <!-- Griglia posts -->
         <div v-if="posts.length > 0" class="posts-grid">
-          <div 
+          <PostCard
             v-for="post in posts" 
             :key="post.PhotoID"
-            class="post-thumbnail"
-            @click="openPost(post)"
-          >
-            <img 
-              :src="getImageUrl(post.ImageData)" 
-              :alt="post.Caption"
-              class="post-image"
-            >
-            <div class="post-overlay">
-              <div class="post-stats">
-                <span class="stat-item">
-                  <i class="fas fa-heart"></i> {{ post.Nlike }}
-                </span>
-                <span class="stat-item">
-                  <i class="fas fa-comment"></i> {{ post.Ncomment }}
-                </span>
-              </div>
-            </div>
-          </div>
+            :post="post"
+            @click="openPostModal"
+          />
         </div>
 
         <!-- Messaggio se non ci sono posts -->
@@ -167,6 +141,15 @@
           </div>
         </div>
       </div>
+
+      <!-- Modal per visualizzazione post -->
+      <PostModal
+        v-if="selectedPost"
+        :postData="selectedPost"
+        @close="closePostModal"
+        @deleted="onPostDeleted"
+        @postUpdated="onPostUpdated"
+      />
     </div>
   </LoadingSpinner>
 </template>
@@ -195,14 +178,16 @@ export default {
       // Edit profile data
       newUsername: '',
       savingUsername: false,
-      editError: null
+      editError: null,
+
+      // Post modal
+      selectedPost: null
     }
   },
   computed: {
     profileUserId() {
       const userIdParam = this.$route.params.userID;
       
-      // Se il parametro è "null" (stringa), restituisci null
       if (userIdParam === 'null' || userIdParam === 'undefined') {
         return null;
       }
@@ -223,26 +208,21 @@ export default {
       }
     },
     isOwnProfile() {
-      const result = this.profileUserId && this.currentUserId && this.profileUserId === this.currentUserId;
-      return result;
+      return this.profileUserId && this.currentUserId && this.profileUserId === this.currentUserId;
     }
   },
   async created() {
-    
-    // Se userID è "null" (stringa), reindirizza al profilo dell'utente corrente
     if (this.$route.params.userID === 'null' || this.$route.params.userID === 'undefined') {
       if (this.currentUserId) {
         this.$router.replace(`/profiles/${this.currentUserId}`);
         return;
       } else {
-        // Se non c'è neanche un utente corrente, vai al login
         this.$router.replace('/login');
         return;
       }
     }
     
     if (!this.profileUserId) {
-      console.error('No valid profileUserId, cannot load profile');
       this.error = 'Invalid user ID in URL';
       this.loading = false;
       return;
@@ -250,10 +230,18 @@ export default {
     
     await this.loadProfile();
     await this.loadPosts();
+
+    // ✅ Ascolta per nuovi post uploadati
+    window.addEventListener('postUploaded', this.handlePostUploaded);
   },
+
+  beforeUnmount() {
+    // ✅ Rimuovi listener
+    window.removeEventListener('postUploaded', this.handlePostUploaded);
+  },
+
   watch: {
     '$route.params.userID'(newUserID, oldUserID) {
-      // Se il nuovo userID è "null", reindirizza
       if (newUserID === 'null' || newUserID === 'undefined') {
         if (this.currentUserId) {
           this.$router.replace(`/profiles/${this.currentUserId}`);
@@ -266,159 +254,186 @@ export default {
     }
   },
   methods: {
+    // ✅ Nuovo metodo per gestire post uploadati
+    handlePostUploaded() {
+      // Ricarica i post solo se siamo sul profilo corrente
+      if (this.isOwnProfile) {
+        this.loadPosts();
+      }
+    },
+
     async loadProfile() {
       if (!this.profileUserId) {
-        console.error('Cannot load profile: profileUserId is', this.profileUserId);
         this.error = 'Invalid user ID';
         this.loading = false;
         return;
       }
       
-      this.loading = true
-      this.error = null
+      this.loading = true;
+      this.error = null;
       
       try {
-        const response = await this.$axios.get(`/profiles/${this.profileUserId}`)
-        this.profile = response.data
+        const response = await this.$axios.get(`/profiles/${this.profileUserId}`);
+        this.profile = response.data;
       } catch (error) {
-        console.error('Profile load error:', error)
+        console.error('Profile load error:', error);
         if (error.response?.status === 403) {
-          this.error = 'This user has blocked you or their profile is private.'
+          this.error = 'This user has blocked you or their profile is private.';
         } else if (error.response?.status === 404) {
-          this.error = 'User not found.'
+          this.error = 'User not found.';
         } else if (error.response?.status === 400) {
-          this.error = 'Invalid user ID.'
+          this.error = 'Invalid user ID.';
+        } else if (error.response?.status === 401) {
+          this.$router.push('/login');
+          return;
         } else {
-          this.error = 'Failed to load profile. Please try again.'
+          this.error = 'Failed to load profile. Please try again.';
         }
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     async loadPosts() {
-      if (!this.profileUserId) return
+      if (!this.profileUserId) return;
       
       try {
-        const response = await this.$axios.get(`/profiles/${this.profileUserId}/posts`)
-        this.posts = response.data || []
+        const response = await this.$axios.get(`/profiles/${this.profileUserId}/posts`);
+        this.posts = response.data || [];
       } catch (error) {
-        console.error('Posts load error:', error)
-        this.posts = []
+        console.error('Posts load error:', error);
+        if (error.response?.status === 401) {
+          this.$router.push('/login');
+          return;
+        }
+        this.posts = [];
       }
     },
 
     async loadFollowers() {
-      this.loadingFollowers = true
+      this.loadingFollowers = true;
       try {
-        const response = await this.$axios.get(`/profiles/${this.profileUserId}/followers`)
-        this.followers = response.data || []
+        const response = await this.$axios.get(`/profiles/${this.profileUserId}/followers`);
+        this.followers = response.data || [];
       } catch (error) {
-        console.error('Followers load error:', error)
-        this.followers = []
+        console.error('Followers load error:', error);
+        this.followers = [];
       } finally {
-        this.loadingFollowers = false
+        this.loadingFollowers = false;
       }
     },
 
     async loadFollowing() {
-      this.loadingFollowing = true
+      this.loadingFollowing = true;
       try {
-        const response = await this.$axios.get(`/profiles/${this.profileUserId}/followings`)
-        this.following = response.data || []
+        const response = await this.$axios.get(`/profiles/${this.profileUserId}/followings`);
+        this.following = response.data || [];
       } catch (error) {
-        console.error('Following load error:', error)
-        this.following = []
+        console.error('Following load error:', error);
+        this.following = [];
       } finally {
-        this.loadingFollowing = false
+        this.loadingFollowing = false;
       }
     },
 
     showFollowersList() {
-      this.showFollowersModal = true
-      this.loadFollowers()
+      this.showFollowersModal = true;
+      this.loadFollowers();
     },
 
     showFollowingList() {
-      this.showFollowingModal = true
-      this.loadFollowing()
+      this.showFollowingModal = true;
+      this.loadFollowing();
     },
 
     showEditProfileModal() {
-      this.newUsername = this.profile.User.Username
-      this.editError = null
-      this.showEditModal = true
+      this.newUsername = this.profile.User.Username;
+      this.editError = null;
+      this.showEditModal = true;
     },
 
     async saveUsername() {
-      this.savingUsername = true
-      this.editError = null
+      this.savingUsername = true;
+      this.editError = null;
       
       try {
         await this.$axios.put(`/profiles/${this.currentUserId}/username`, {
           username: this.newUsername
-        })
+        });
         
-        // Aggiorna localStorage
-        const user = JSON.parse(localStorage.getItem('user'))
-        user.Username = this.newUsername
-        localStorage.setItem('user', JSON.stringify(user))
+        const user = JSON.parse(localStorage.getItem('user'));
+        user.Username = this.newUsername;
+        localStorage.setItem('user', JSON.stringify(user));
         
-        // Ricarica il profilo
-        await this.loadProfile()
-        this.closeModal()
+        await this.loadProfile();
+        this.closeModal();
         
       } catch (error) {
-        console.error('Username save error:', error)
+        console.error('Username save error:', error);
         if (error.response?.status === 400) {
-          this.editError = 'Username already taken or invalid.'
+          this.editError = 'Username already taken or invalid.';
         } else {
-          this.editError = 'Failed to update username. Please try again.'
+          this.editError = 'Failed to update username. Please try again.';
         }
       } finally {
-        this.savingUsername = false
+        this.savingUsername = false;
       }
     },
 
     handleUserBanned() {
-      this.$router.push(`/profiles/${this.currentUserId}/feed`)
+      this.$router.push(`/profiles/${this.currentUserId}/feed`);
     },
 
     closeModal() {
-      this.showFollowersModal = false
-      this.showFollowingModal = false
-      this.showEditModal = false
-      this.editError = null
+      this.showFollowersModal = false;
+      this.showFollowingModal = false;
+      this.showEditModal = false;
+      this.editError = null;
     },
 
     scrollToPosts() {
-      const postsSection = document.querySelector('.posts-section')
+      const postsSection = document.querySelector('.posts-section');
       if (postsSection) {
-        postsSection.scrollIntoView({ behavior: 'smooth' })
+        postsSection.scrollIntoView({ behavior: 'smooth' });
       }
     },
 
-    createNewPost() {
-      console.log('Create new post clicked')
-    },
-
-    openPost(post) {
-      console.log('Open post:', post.PhotoID)
-    },
-
-    getImageUrl(imageData) {
-      if (!imageData) return '/placeholder-image.jpg'
-      
-      if (typeof imageData === 'string' && imageData.startsWith('http')) {
-        return imageData
+    openPostModal(post) {
+      if (!post.UserID) {
+        post.UserID = this.profileUserId;
       }
       
-      try {
-        const blob = new Blob([new Uint8Array(imageData)], { type: 'image/jpeg' })
-        return URL.createObjectURL(blob)
-      } catch (error) {
-        console.error('Error creating image URL:', error)
-        return '/placeholder-image.jpg'
+      if (!post.Username && this.profile?.User?.Username) {
+        post.Username = this.profile.User.Username;
+      }
+      
+      // ✅ CLONA il post per evitare modifiche dirette
+      this.selectedPost = { ...post };
+    },
+
+    closePostModal() {
+      this.selectedPost = null;
+    },
+
+    onPostDeleted() {
+      this.loadPosts();
+      this.closePostModal();
+    },
+
+    // ✅ NUOVO: Aggiorna il post nella lista quando cambia nel modal
+    onPostUpdated(updatedData) {
+      const postIndex = this.posts.findIndex(p => p.PhotoID === updatedData.PhotoID);
+      if (postIndex !== -1) {
+        // Aggiorna il post nella lista
+        this.posts[postIndex] = {
+          ...this.posts[postIndex],
+          Nlike: updatedData.Nlike,
+          IsLiked: updatedData.IsLiked,
+          Ncomment: updatedData.Ncomment
+        };
+        
+        // Forza il re-render del componente
+        this.$forceUpdate();
       }
     }
   }
@@ -439,57 +454,8 @@ export default {
 
 .posts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.post-thumbnail {
-  position: relative;
-  aspect-ratio: 1;
-  cursor: pointer;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
-}
-
-.post-thumbnail:hover {
-  transform: scale(1.02);
-}
-
-.post-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.post-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.post-thumbnail:hover .post-overlay {
-  opacity: 1;
-}
-
-.post-stats {
-  color: white;
-  text-align: center;
-}
-
-.stat-item {
-  display: inline-block;
-  margin: 0 10px;
-  font-weight: 600;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
 }
 
 .no-posts {
@@ -581,14 +547,29 @@ export default {
   text-decoration: underline;
 }
 
+/* ✅ RESPONSIVE: su mobile 2 colonne, su tablet 3 colonne */
 @media (max-width: 768px) {
   .profile-view {
     padding: 10px;
   }
 
   .posts-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(2, 1fr); /* 2 colonne su mobile */
     gap: 10px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .posts-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 colonne su tablet */
+    gap: 12px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .posts-grid {
+    grid-template-columns: repeat(3, 1fr); /* 3 colonne su desktop */
+    gap: 15px;
   }
 }
 </style>
