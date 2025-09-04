@@ -33,7 +33,7 @@ var comment_table = `CREATE TABLE IF NOT EXISTS Comment
 				(
 					commentID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 					userID INTEGER NOT NULL,
-					textComment TEXT NOT NULL,
+					lyric TEXT NOT NULL, 
 					PhotoID INTEGER NOT NULL,
 					created_at TEXT NOT NULL,
 					CONSTRAINT fk_comment

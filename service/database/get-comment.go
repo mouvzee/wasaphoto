@@ -2,7 +2,7 @@ package database
 
 import "time"
 
-var getCommentsQUERY = `SELECT commentID, userID, PhotoID, textComment, created_at 
+var getCommentsQUERY = `SELECT commentID, userID, PhotoID, lyric, created_at 
 							FROM Comment 
 							WHERE PhotoID = ?
 							ORDER BY created_at ASC`
