@@ -1,0 +1,25 @@
+# Create the base go image 
+FROM golang:1.19.1 AS build
+
+# Copy the go source code in build
+WORKDIR /src/
+COPY . .
+
+# Build the executable in build
+RUN go build -o /app/webapi ./cmd/webapi
+
+# Create the final image
+FROM debian:bullseye
+
+# Expose the port
+EXPOSE 3000 4000
+
+# Create a directory for the storage
+RUN mkdir -p /app/storage
+
+# Copy the exec from build to the final image
+WORKDIR /app
+COPY --from=build /app/webapi ./
+
+# Set the default program to our backend
+CMD ["/app/webapi"]

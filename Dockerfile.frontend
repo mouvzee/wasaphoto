@@ -1,0 +1,22 @@
+# Use the latest Node LTS image
+FROM node:lts AS builder
+
+# Copy the source code in builder
+WORKDIR /app
+COPY webui webui
+
+# Build Vue.js into plain HTML/CSS/JS
+WORKDIR /app/webui
+RUN npm run build-prod
+
+# Create final container
+FROM nginx:stable
+
+# Copy the built files from the builder stage
+COPY --from=builder /app/webui/dist /usr/share/nginx/html
+
+# Expose the port
+EXPOSE 80
+
+# Run the web server
+CMD ["nginx", "-g", "daemon off;"]
