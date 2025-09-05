@@ -46,8 +46,8 @@
             <!-- Header utente -->
             <div class="post-user-header">
               <div class="user-info">
-                <div class="user-avatar">
-                  <i class="fas fa-user"></i>
+                <div class="user-avatar" :style="avatarStyle">
+                  <span class="avatar-initials">{{ userInitials }}</span>
                 </div>
                 <RouterLink 
                   :to="`/profiles/${post.UserID}`" 
@@ -238,6 +238,32 @@ export default {
     },
     isOwner() {
       return this.post && this.currentUserId && this.post.UserID === this.currentUserId;
+    },
+    // ✅ NUOVO: Avatar initials come in FeedPost
+    userInitials() {
+      if (!this.post?.Username) return '?';
+      return this.post.Username.charAt(0).toUpperCase();
+    },
+    
+    // ✅ NUOVO: Avatar style come in FeedPost
+    avatarStyle() {
+      const username = this.post?.Username || 'default';
+      const colors = [
+        '#e74c3c', '#3498db', '#2ecc71', '#f39c12', 
+        '#9b59b6', '#1abc9c', '#34495e', '#e67e22'
+      ];
+      
+      let hash = 0;
+      for (let i = 0; i < username.length; i++) {
+        hash = username.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      
+      const color = colors[Math.abs(hash) % colors.length];
+      
+      return {
+        backgroundColor: color,
+        color: 'white'
+      };
     }
   },
   async created() {
@@ -313,11 +339,11 @@ export default {
 
       try {
         if (this.post.Liked) {
-          await this.$axios.delete(`/profiles/${this.post.UserID}/posts/${this.post.PhotoID}/likes/${this.currentUserId}`);
+          await this.$axios.delete(`/profiles/${this.post.UserID}/posts/${this.post.PhotoID}/likes/0`);
           this.post.Liked = false;
           this.post.Nlike = Math.max(0, this.post.Nlike - 1);
         } else {
-          await this.$axios.put(`/profiles/${this.post.UserID}/posts/${this.post.PhotoID}/likes`);
+          await this.$axios.put(`/profiles/${this.post.UserID}/posts/${this.post.PhotoID}/likes/0`);
           this.post.Liked = true;
           this.post.Nlike++;
         }
@@ -607,12 +633,16 @@ export default {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 12px;
-  color: #8e8e8e;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.avatar-initials {
+  line-height: 1;
 }
 
 .username {

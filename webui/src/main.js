@@ -9,6 +9,7 @@ import ProfileStats from './components/ProfileStats.vue'
 import PostCard from './components/PostCard.vue';
 import PostModal from './components/PostModal.vue';
 import UploadModal from './components/UploadModal.vue';
+import FeedPost from './components/FeedPost.vue'; // ✅ NUOVO
 
 import './assets/dashboard.css'
 import './assets/main.css'
@@ -22,6 +23,7 @@ app.component("ProfileStats", ProfileStats);
 app.component("PostCard", PostCard);
 app.component("PostModal", PostModal);
 app.component("UploadModal", UploadModal);
+app.component("FeedPost", FeedPost); // ✅ NUOVO
 
 app.use(router)
 app.mount('#app')

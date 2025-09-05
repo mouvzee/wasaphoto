@@ -15,6 +15,7 @@
         @showFollowers="showFollowersList"
         @showFollowing="showFollowingList"
         @showPosts="scrollToPosts"
+        @showBannedUsers="showBannedUsersList"
       />
 
       <!-- Sezione posts -->
@@ -142,6 +143,39 @@
         </div>
       </div>
 
+      <div v-if="showBannedModal" class="modal-overlay" @click="closeModal">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h5>Banned Users</h5>
+            <button class="btn-close" @click="closeModal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <LoadingSpinner :loading="loadingBanned">
+              <div v-if="bannedUsers.length > 0" class="users-list">
+                <div v-for="user in bannedUsers" :key="user.UserID" class="user-item">
+                  <div class="user-info">
+                    <div class="user-avatar">
+                      <i class="fas fa-user"></i>
+                    </div>
+                    <span class="username">{{ user.Username }}</span>
+                  </div>
+                  <button 
+                    class="btn btn-sm btn-outline-primary"
+                    @click="unbanUser(user)"
+                    :disabled="unbanning === user.UserID"
+                  >
+                    {{ unbanning === user.UserID ? 'Unbanning...' : 'Unban' }}
+                  </button>
+                </div>
+              </div>
+              <div v-else class="text-center text-muted">
+                No banned users
+              </div>
+            </LoadingSpinner>
+          </div>
+        </div>
+      </div>
+
       <!-- Modal per visualizzazione post -->
       <PostModal
         v-if="selectedPost"
@@ -168,12 +202,18 @@ export default {
       showFollowersModal: false,
       showFollowingModal: false,
       showEditModal: false,
+      showBannedModal: false,
       
       // Followers/Following data
       followers: [],
       following: [],
       loadingFollowers: false,
       loadingFollowing: false,
+      
+      
+      bannedUsers: [],
+      loadingBanned: false,
+      unbanning: null,
       
       // Edit profile data
       newUsername: '',
@@ -311,6 +351,19 @@ export default {
       }
     },
 
+    async loadBannedUsers() {
+      this.loadingBanned = true;
+      try {
+        const response = await this.$axios.get(`/profiles/${this.currentUserId}/bans`);
+        this.bannedUsers = response.data || [];
+      } catch (error) {
+        console.error('Banned users load error:', error);
+        this.bannedUsers = [];
+      } finally {
+        this.loadingBanned = false;
+      }
+    },
+
     showFollowersList() {
       this.showFollowersModal = true;
       this.loadFollowers();
@@ -319,6 +372,11 @@ export default {
     showFollowingList() {
       this.showFollowingModal = true;
       this.loadFollowing();
+    },
+
+    showBannedUsersList() {
+      this.showBannedModal = true;
+      this.loadBannedUsers();
     },
 
     showEditProfileModal() {
@@ -355,6 +413,26 @@ export default {
       }
     },
 
+    async unbanUser(user) {
+      if (!confirm(`Are you sure you want to unban ${user.Username}?`)) {
+        return;
+      }
+
+      this.unbanning = user.UserID;
+      try {
+        await this.$axios.delete(`/profiles/${this.currentUserId}/bans/${user.UserID}`);
+        
+        // Rimuovi dalla lista locale
+        this.bannedUsers = this.bannedUsers.filter(u => u.UserID !== user.UserID);
+        
+      } catch (error) {
+        console.error('Unban error:', error);
+        alert('Failed to unban user. Please try again.');
+      } finally {
+        this.unbanning = null;
+      }
+    },
+
     handleUserBanned() {
       this.$router.push(`/profiles/${this.currentUserId}/feed`);
     },
@@ -363,6 +441,7 @@ export default {
       this.showFollowersModal = false;
       this.showFollowingModal = false;
       this.showEditModal = false;
+      this.showBannedModal = false;
       this.editError = null;
     },
 
@@ -486,6 +565,7 @@ export default {
 .user-item {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Per allineare il pulsante a destra */
   padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
 }
@@ -510,6 +590,12 @@ export default {
   justify-content: center;
   margin-right: 12px;
   color: #8e8e8e;
+}
+
+.username {
+  color: #262626;
+  font-weight: 500;
+  margin-left: 12px;
 }
 
 .username-link {
