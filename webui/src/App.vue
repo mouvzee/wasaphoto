@@ -1,8 +1,9 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 </script>
+
 <script>
-import { setAuth } from '@/services/axios.js'
+import { setAuth, validateToken } from '@/services/axios.js'
 
 export default {
   data() {
@@ -10,7 +11,8 @@ export default {
       // Stato reattivo per l'utente corrente
       reactiveUserId: null,
       storageCheckInterval: null,
-      showUploadModal: false
+      showUploadModal: false,
+      isInitialized: false
     }
   },
   computed: {
@@ -22,9 +24,8 @@ export default {
       return this.reactiveUserId;
     }
   },
-  created() {
-    // ✅ INIZIALIZZA il token all'avvio
-    this.initializeAuth();
+  async created() {
+    await this.initializeAuth();
     this.updateCurrentUser();
     
     // Controlla periodicamente per cambiamenti nel localStorage
@@ -45,11 +46,21 @@ export default {
     }
   },
   methods: {
-    // ✅ NUOVO: Inizializza l'autenticazione
-    initializeAuth() {
-      const token = localStorage.getItem('token');
-      if (token && token !== '0' && token !== 'null' && token !== 'undefined') {
-        setAuth(token);
+    async initializeAuth() {
+      try {
+        const isValid = await validateToken();
+        if (!isValid && !this.isLoginPage) {
+          // Token non valido e non siamo nella pagina di login
+          this.$router.push('/login');
+        }
+        setAuth();
+      } catch (error) {
+        console.error('Error validating token:', error);
+        if (!this.isLoginPage) {
+          this.$router.push('/login');
+        }
+      } finally {
+        this.isInitialized = true;
       }
     },
 
@@ -76,16 +87,16 @@ export default {
       } catch (error) {
         console.error('App.vue - Error parsing user:', error);
         this.reactiveUserId = null;
+        localStorage.clear();
       }
     },
     
     logout() {
       localStorage.clear();
-      setAuth(null); 
+      setAuth();
       // Forza l'aggiornamento dell'utente corrente
       this.reactiveUserId = null;
-      
-      window.location.href = '/#/login';
+      this.$router.push('/login');
     },
 
     openUploadModal() {
@@ -195,14 +206,13 @@ export default {
 </template>
 
 <style>
-/* Maggiore spaziatura tra icona e testo */
+
 .feather {
   width: 16px;
   height: 16px;
   margin-right: 12px; /* Aumentato da 8px a 12px */
 }
 
-/* Sidebar senza navbar */
 .sidebar {
   position: fixed;
   top: 0; /* Ora parte da 0 invece che da 48px */
@@ -223,7 +233,6 @@ export default {
   overflow-y: auto;
 }
 
-/* Stili per l'header della sidebar */
 .sidebar-header {
   border-bottom: 1px solid #e9ecef;
   padding-bottom: 1rem;
@@ -236,7 +245,6 @@ export default {
   margin-bottom: 1rem;
 }
 
-/* Pulsante Upload Post */
 .upload-btn {
   font-weight: 600;
   border-radius: 25px;
@@ -254,15 +262,14 @@ export default {
   background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
 }
 
-/* Migliori stili per i nav links */
 .sidebar .nav-link {
   font-weight: 500;
   color: #333;
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem; /* Aumentato padding per più spazio */
+  padding: 0.75rem 1rem; 
   border-radius: 0.375rem;
-  margin: 0.25rem 0.5rem; /* Margini per distanziare i link */
+  margin: 0.25rem 0.5rem;
   transition: all 0.2s ease;
 }
 
@@ -277,7 +284,6 @@ export default {
   font-weight: 600;
 }
 
-/* Contenuto principale ora parte da sinistra */
 .main-content {
   padding-top: 2rem;
   min-height: 100vh;

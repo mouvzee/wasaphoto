@@ -212,82 +212,46 @@ export default {
     }
   },
   async created() {
-    if (this.$route.params.userID === 'null' || this.$route.params.userID === 'undefined') {
-      if (this.currentUserId) {
-        this.$router.replace(`/profiles/${this.currentUserId}`);
-        return;
-      } else {
-        this.$router.replace('/login');
-        return;
-      }
-    }
-    
-    if (!this.profileUserId) {
-      this.error = 'Invalid user ID in URL';
-      this.loading = false;
-      return;
-    }
-    
     await this.loadProfile();
     await this.loadPosts();
 
-    // ✅ Ascolta per nuovi post uploadati
-    window.addEventListener('postUploaded', this.handlePostUploaded);
+    window.addEventListener('postUploaded', this.onPostUploaded);
   },
 
   beforeUnmount() {
-    // ✅ Rimuovi listener
-    window.removeEventListener('postUploaded', this.handlePostUploaded);
+    window.removeEventListener('postUploaded', this.onPostUploaded);
   },
 
-  watch: {
-    '$route.params.userID'(newUserID, oldUserID) {
-      if (newUserID === 'null' || newUserID === 'undefined') {
-        if (this.currentUserId) {
-          this.$router.replace(`/profiles/${this.currentUserId}`);
-        }
-        return;
-      }
-      
-      this.loadProfile();
-      this.loadPosts();
-    }
-  },
   methods: {
-    // ✅ Nuovo metodo per gestire post uploadati
-    handlePostUploaded() {
-      // Ricarica i post solo se siamo sul profilo corrente
-      if (this.isOwnProfile) {
-        this.loadPosts();
-      }
+    async onPostUploaded() {
+      // Ricarica sia il profilo (per il counter) che i post
+      await Promise.all([
+        this.loadProfile(),
+        this.loadPosts()
+      ]);
     },
 
     async loadProfile() {
-      if (!this.profileUserId) {
-        this.error = 'Invalid user ID';
-        this.loading = false;
-        return;
-      }
-      
       this.loading = true;
       this.error = null;
-      
+
       try {
         const response = await this.$axios.get(`/profiles/${this.profileUserId}`);
-        this.profile = response.data;
+        
+        if (response.data) {
+          this.profile = response.data;
+        } else {
+          throw new Error('No profile data received');
+        }
       } catch (error) {
         console.error('Profile load error:', error);
-        if (error.response?.status === 403) {
-          this.error = 'This user has blocked you or their profile is private.';
-        } else if (error.response?.status === 404) {
+        this.error = 'Failed to load profile. Please try again.';
+        
+        if (error.response?.status === 404) {
           this.error = 'User not found.';
-        } else if (error.response?.status === 400) {
-          this.error = 'Invalid user ID.';
         } else if (error.response?.status === 401) {
           this.$router.push('/login');
           return;
-        } else {
-          this.error = 'Failed to load profile. Please try again.';
         }
       } finally {
         this.loading = false;
@@ -295,18 +259,29 @@ export default {
     },
 
     async loadPosts() {
-      if (!this.profileUserId) return;
-      
+      this.loadingPosts = true;
+      this.postsError = null;
+
       try {
         const response = await this.$axios.get(`/profiles/${this.profileUserId}/posts`);
         this.posts = response.data || [];
+      
+        if (this.profile && this.profile.PostsCount !== this.posts.length) {
+          this.profile.PostsCount = this.posts.length;
+        }
+        
       } catch (error) {
         console.error('Posts load error:', error);
-        if (error.response?.status === 401) {
+        this.postsError = 'Failed to load posts.';
+        
+        if (error.response?.status === 404) {
+          this.posts = [];
+        } else if (error.response?.status === 401) {
           this.$router.push('/login');
           return;
         }
-        this.posts = [];
+      } finally {
+        this.loadingPosts = false;
       }
     },
 
@@ -407,7 +382,6 @@ export default {
         post.Username = this.profile.User.Username;
       }
       
-      // ✅ CLONA il post per evitare modifiche dirette
       this.selectedPost = { ...post };
     },
 
@@ -415,24 +389,25 @@ export default {
       this.selectedPost = null;
     },
 
-    onPostDeleted() {
-      this.loadPosts();
+    async onPostDeleted() {
+      await Promise.all([
+        this.loadProfile(),
+        this.loadPosts()
+      ]);
+      
       this.closePostModal();
     },
 
-    // ✅ NUOVO: Aggiorna il post nella lista quando cambia nel modal
     onPostUpdated(updatedData) {
       const postIndex = this.posts.findIndex(p => p.PhotoID === updatedData.PhotoID);
       if (postIndex !== -1) {
-        // Aggiorna il post nella lista
         this.posts[postIndex] = {
           ...this.posts[postIndex],
           Nlike: updatedData.Nlike,
-          IsLiked: updatedData.IsLiked,
+          Liked: updatedData.Liked,
           Ncomment: updatedData.Ncomment
         };
         
-        // Forza il re-render del componente
         this.$forceUpdate();
       }
     }
@@ -547,7 +522,6 @@ export default {
   text-decoration: underline;
 }
 
-/* ✅ RESPONSIVE: su mobile 2 colonne, su tablet 3 colonne */
 @media (max-width: 768px) {
   .profile-view {
     padding: 10px;

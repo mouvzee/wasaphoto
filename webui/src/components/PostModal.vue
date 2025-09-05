@@ -138,7 +138,7 @@
                 <button 
                   class="btn btn-link p-0 me-3"
                   @click="toggleLike"
-                  :class="{ 'text-danger': post.IsLiked }"
+                  :class="{ 'text-danger': post.Liked }"
                   :disabled="likingInProgress"
                 >
                   <i class="fas fa-heart fa-lg"></i>
@@ -245,7 +245,7 @@ export default {
       ...this.postData,
       Nlike: this.postData.Nlike || 0,
       Ncomment: this.postData.Ncomment || 0,
-      IsLiked: this.postData.IsLiked || false,
+      Liked: this.postData.Liked || false,
       Username: this.postData.Username || 'Unknown User'
     };
     
@@ -270,7 +270,7 @@ export default {
         
         if (currentPost) {
           this.post.Nlike = currentPost.Nlike || 0;
-          this.post.IsLiked = currentPost.IsLiked || false;
+          this.post.Liked = currentPost.Liked || false;
           this.post.Caption = this.post.Caption || currentPost.Caption;
           this.post.CreatedAt = this.post.CreatedAt || currentPost.CreatedAt;
         }
@@ -285,12 +285,10 @@ export default {
         const response = await this.$axios.get(`/profiles/${this.post.UserID}/posts/${this.post.PhotoID}/comments`);
         const rawComments = response.data || [];
         
-        // ✅ CORREZIONE: Il backend restituisce User.UserID e User.Username
         const processedComments = rawComments.map(comment => ({
           CommentID: comment.CommentID,
           Lyric: comment.Lyric,
           Created_At: comment.Created_At,
-          // ✅ Estrai UserID e Username dal campo User
           UserID: comment.User?.UserID || null,
           Username: comment.User?.Username || 'Unknown User'
         }));
@@ -314,20 +312,20 @@ export default {
       this.likingInProgress = true;
 
       try {
-        if (this.post.IsLiked) {
+        if (this.post.Liked) {
           await this.$axios.delete(`/profiles/${this.post.UserID}/posts/${this.post.PhotoID}/likes/${this.currentUserId}`);
-          this.post.IsLiked = false;
+          this.post.Liked = false;
           this.post.Nlike = Math.max(0, this.post.Nlike - 1);
         } else {
           await this.$axios.put(`/profiles/${this.post.UserID}/posts/${this.post.PhotoID}/likes`);
-          this.post.IsLiked = true;
+          this.post.Liked = true;
           this.post.Nlike++;
         }
         
         this.$emit('postUpdated', {
           PhotoID: this.post.PhotoID,
           Nlike: this.post.Nlike,
-          IsLiked: this.post.IsLiked,
+          Liked: this.post.Liked,
           Ncomment: this.post.Ncomment
         });
         
@@ -387,7 +385,6 @@ export default {
           }
         );
 
-        // ✅ Crea il nuovo commento con la stessa struttura del backend
         const newCommentData = {
           CommentID: response.data.CommentID || Date.now(),
           Lyric: this.newComment.trim(),
@@ -403,7 +400,7 @@ export default {
         this.$emit('postUpdated', {
           PhotoID: this.post.PhotoID,
           Nlike: this.post.Nlike,
-          IsLiked: this.post.IsLiked,
+          Liked: this.post.Liked,
           Ncomment: this.post.Ncomment
         });
 
@@ -446,7 +443,7 @@ export default {
         this.$emit('postUpdated', {
           PhotoID: this.post.PhotoID,
           Nlike: this.post.Nlike,
-          IsLiked: this.post.IsLiked,
+          Liked: this.post.Liked,
           Ncomment: this.post.Ncomment
         });
 
@@ -459,7 +456,7 @@ export default {
           this.$emit('postUpdated', {
             PhotoID: this.post.PhotoID,
             Nlike: this.post.Nlike,
-            IsLiked: this.post.IsLiked,
+            Liked: this.post.Liked,
             Ncomment: this.post.Ncomment
           });
         } else {

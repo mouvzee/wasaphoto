@@ -180,7 +180,6 @@ export default {
           },
         });
 
-        // ✅ Emetti solo 'uploaded' senza fare refresh
         this.$emit('uploaded');
       } catch (error) {
         console.error('Upload error:', error);
