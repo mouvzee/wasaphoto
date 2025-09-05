@@ -24,7 +24,7 @@ func (db *appdbimpl) ViewPosts(userID int) ([]Photo, error) {
 		var u User
 		var createdAtStr string
 
-		//information about the photo
+		// information about the photo
 		err = lines.Scan(&photo.PhotoID, &u.UserID, &photo.Caption, &createdAtStr)
 		if err != nil {
 			return nil, err
@@ -36,19 +36,19 @@ func (db *appdbimpl) ViewPosts(userID int) ([]Photo, error) {
 			return nil, err
 		}
 
-		//number of like
+		// number of like
 		err = db.c.QueryRow(getlikeQUERY, photo.PhotoID, userID).Scan(&photo.Nlike)
 		if err != nil {
 			return nil, err
 		}
 
-		//number of comments
+		// number of comments
 		err = db.c.QueryRow(getCommentQUERY, photo.PhotoID, userID).Scan(&photo.Ncomment)
 		if err != nil {
 			return nil, err
 		}
 
-		//check status photo between liked or not
+		// check status photo between liked or not
 		var check int
 		err = db.c.QueryRow(statusPhotoQUERY, userID, photo.PhotoID).Scan(&check)
 		if err != nil {
@@ -60,7 +60,7 @@ func (db *appdbimpl) ViewPosts(userID int) ([]Photo, error) {
 			photo.Liked = false
 		}
 
-		//find the owner information
+		// find the owner information
 		user, err := db.GetUsernamebyID(userID)
 		if err != nil {
 			return nil, err

@@ -36,7 +36,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 
 	// Check if the user is authorized
 	if profileUserID != userID {
-		http.Error(w, "Forbidden", http.StatusBadRequest)
+		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 

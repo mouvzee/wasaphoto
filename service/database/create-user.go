@@ -12,14 +12,14 @@ func (db *appdbimpl) CreateUser(x User) (User, error) {
 	var user User
 	user.Username = x.Username
 
-	//userID
+	// userID
 	var _id = sql.NullInt64{Int64: 0, Valid: false}
 	y, err := db.c.Query(findID)
 	if err != nil {
 		return user, err
 	}
 
-	//prepare a list of row to check the ids
+	// prepare a list of row to check the ids
 	var id int
 	for y.Next() {
 		if y.Err() != nil {
@@ -31,7 +31,7 @@ func (db *appdbimpl) CreateUser(x User) (User, error) {
 			return user, err
 		}
 
-		//check if ID is valid
+		// check if ID is valid
 		if !_id.Valid {
 			id = 0
 		} else {
@@ -42,7 +42,7 @@ func (db *appdbimpl) CreateUser(x User) (User, error) {
 	// set the userID
 	user.UserID = id + 1
 
-	//insert User in the database
+	// insert User in the database
 	_, err = db.c.Exec(adduser, user.UserID, user.Username)
 	if err != nil {
 		return user, err

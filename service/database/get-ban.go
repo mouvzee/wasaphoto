@@ -20,12 +20,12 @@ func (db *appdbimpl) GetBan(bannerID int) ([]User, error) {
 			return nil, err
 		}
 
-		//taking the userID of the new banned user
+		// taking the userID of the new banned user
 		u, err := db.GetUsernamebyID(bannedID)
 		if err != nil {
 			return nil, err
 		}
-		//append the new banned user in the array
+		// append the new banned user in the array
 		b = append(b, u)
 	}
 

@@ -17,7 +17,7 @@ The comment is deleted from the database.
 
 func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	// Get the profileUserID and PhotoID from the URL
-	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
+	_, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
 		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
 		return
@@ -29,12 +29,6 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	// Check if the user is allowed to delete the comment
-	if profileUserID != ctx.UserID {
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-
 	// Get commentID from query
 	commentID, err := strconv.Atoi(ps.ByName("commentID"))
 	if err != nil {
@@ -42,10 +36,17 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
+	userID := ctx.UserID
+
 	// Delete the comment
-	err = rt.db.DeleteComment(commentID, photoID)
+	err = rt.db.DeleteComment(commentID, photoID, userID)
 	if err != nil {
 		ctx.Logger.WithError(err).Error("Error uncommenting photo")
+		// Se il database restituisce errore, significa nessun permesso
+		if err.Error() == "comment not found or permission denied" {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

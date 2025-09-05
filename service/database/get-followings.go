@@ -3,7 +3,7 @@ package database
 var getFollowingsQUERY = `SELECT userID, username FROM User WHERE userID IN (SELECT followedID FROM Follow WHERE followerID=?)`
 
 func (db *appdbimpl) GetFollowings(followerID int) ([]User, error) {
-	//taking the followings from the database
+	// taking the followings from the database
 	rows, err := db.c.Query(getFollowingsQUERY, followerID)
 	if err != nil {
 		return nil, err
@@ -18,7 +18,7 @@ func (db *appdbimpl) GetFollowings(followerID int) ([]User, error) {
 		}
 		var following User
 
-		//taking the data of the following to append it
+		// taking the data of the following to append it
 		err = rows.Scan(&following.UserID, &following.Username)
 		if err != nil {
 			return nil, err

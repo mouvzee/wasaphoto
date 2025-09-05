@@ -29,7 +29,7 @@ func (c *Comment) takingComment(dbComment database.Comment) error {
 	c.User = User(dbComment.User)
 	c.Created_At = dbComment.Created_At
 
-	//120 types for every comment
+	// 120 types for every comment
 	b, err := regexp.MatchString("^/[0-9a-zA-Z]{120}/$", c.Lyric)
 	if b {
 		c.Lyric = dbComment.Lyric

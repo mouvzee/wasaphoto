@@ -56,7 +56,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		w.WriteHeader(http.StatusOK)
 	}
 
-	//struct to create the token
+	// struct to create the token
 	type Authorization struct {
 		User  User
 		Token int

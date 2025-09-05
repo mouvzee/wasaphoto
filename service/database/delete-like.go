@@ -13,7 +13,7 @@ func (db *appdbimpl) DeleteLike(userID, PhotoID int) error {
 		return err
 	}
 	if i == 0 {
-		return nil //informa il database ce non ci sono errori
+		return nil // informa il database ce non ci sono errori
 	}
 	return nil
 }

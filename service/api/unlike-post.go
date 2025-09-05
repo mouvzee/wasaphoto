@@ -28,18 +28,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	targetUserID, err := strconv.Atoi(ps.ByName("likeID"))
-	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
-		return
-	}
-
 	userID := ctx.UserID
-
-	if targetUserID != userID {
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
 
 	isBanned, err := rt.db.IsBanned(profileUserID, userID)
 	if err != nil {
@@ -52,7 +41,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	err = rt.db.DeleteLike(profileUserID, PhotoID)
+	err = rt.db.DeleteLike(userID, PhotoID)
 	if err != nil {
 		if errors.Is(err, database.ErrNoRowsAffected) {
 			http.Error(w, "Bad Request there is no one like", http.StatusNotFound)

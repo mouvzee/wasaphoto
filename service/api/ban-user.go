@@ -41,6 +41,17 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
+	err = rt.db.DeleteFollow(profileUserID, targetUserID) // Rimuovi "io seguo lui"
+	if err != nil {
+		ctx.Logger.WithError(err).Warning("Error removing follow relationship during ban")
+		// Non fermare il processo per questo errore
+	}
+
+	err = rt.db.DeleteFollow(targetUserID, profileUserID) // Rimuovi "lui segue me"
+	if err != nil {
+		ctx.Logger.WithError(err).Warning("Error removing follow relationship during ban")
+	}
+
 	// Create the ban in the database
 	err = rt.db.CreateBan(profileUserID, targetUserID)
 	if err != nil {
