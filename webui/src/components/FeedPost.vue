@@ -34,7 +34,7 @@
         <button 
           class="action-btn like-btn"
           @click="toggleLike"
-          :class="{ 'liked': post.Liked }"
+          :class="{ 'liked': localLiked }"
           :disabled="likingInProgress"
         >
           <i class="fas fa-heart"></i>
@@ -47,8 +47,13 @@
 
     <!-- Conteggi like -->
     <div class="post-stats">
-      <div class="likes-count" v-if="post.Nlike > 0">
-        <strong>{{ post.Nlike }} {{ post.Nlike === 1 ? 'like' : 'likes' }}</strong>
+      <div class="likes-count" v-if="localNlike > 0">
+        <strong 
+          class="likes-button" 
+          @click="showLikes"
+        >
+          {{ localNlike }} {{ localNlike === 1 ? 'like' : 'likes' }}
+        </strong>
       </div>
     </div>
 
@@ -83,11 +88,20 @@ export default {
       required: true
     }
   },
-  emits: ['openModal', 'postUpdated'],
+  emits: ['openModal', 'postUpdated', 'showLikes'],
   data() {
     return {
       likingInProgress: false,
-      showOptions: false
+      localLiked: this.post.Liked,
+      localNlike: this.post.Nlike
+    }
+  },
+  watch: {
+    'post.Liked'(newVal) {
+      this.localLiked = newVal;
+    },
+    'post.Nlike'(newVal) {
+      this.localNlike = newVal;
     }
   },
   computed: {
@@ -96,6 +110,7 @@ export default {
                       this.post?.User?.Username || 
                       this.post?.username || 
                       this.post?.user?.username;
+      
       if (!username) return '?';
       return username.charAt(0).toUpperCase();
     },
@@ -157,35 +172,47 @@ export default {
       this.likingInProgress = true;
 
       try {
-        if (this.post.Liked) {
+        if (this.localLiked) {
           await this.$axios.delete(`/profiles/${this.postUserId}/posts/${this.post.PhotoID}/likes/0`);
-          this.post.Liked = false;
-          this.post.Nlike = Math.max(0, this.post.Nlike - 1);
+          this.localLiked = false;
+          this.localNlike = Math.max(0, this.localNlike - 1);
         } else {
           await this.$axios.put(`/profiles/${this.postUserId}/posts/${this.post.PhotoID}/likes/0`);
-          this.post.Liked = true;
-          this.post.Nlike++;
+          this.localLiked = true;
+          this.localNlike++;
         }
         
         this.$emit('postUpdated', {
           PhotoID: this.post.PhotoID,
-          Nlike: this.post.Nlike,
-          Liked: this.post.Liked,
+          Nlike: this.localNlike,
+          Liked: this.localLiked,
           Ncomment: this.post.Ncomment
         });
         
       } catch (error) {
         console.error('Error toggling like:', error);
+        this.localLiked = this.post.Liked;
+        this.localNlike = this.post.Nlike;
       } finally {
         this.likingInProgress = false;
       }
+    },
+
+    showLikes() {
+      this.$emit('showLikes', {
+        PhotoID: this.post.PhotoID,
+        UserID: this.postUserId,
+        LikesCount: this.localNlike
+      });
     },
 
     openPostModal() {
       const postData = {
         ...this.post,
         UserID: this.postUserId,
-        Username: this.displayUsername
+        Username: this.displayUsername,
+        Liked: this.localLiked,
+        Nlike: this.localNlike
       };
       
       this.$emit('openModal', postData);
@@ -223,14 +250,13 @@ export default {
   border: 1px solid #dbdbdb;
   border-radius: 8px;
   margin-bottom: 24px;
-  max-width: 600px; /* ✅ AUMENTATO: da 470px a 600px */
+  max-width: 600px;
   width: 100%;
 }
 
 .post-header {
   display: flex;
   align-items: center;
-  /* ✅ RIMOSSO: justify-content: space-between; */
   padding: 16px;
 }
 
@@ -240,15 +266,15 @@ export default {
 }
 
 .user-avatar {
-  width: 40px; /* ✅ AUMENTATO: da 32px a 40px */
-  height: 40px; /* ✅ AUMENTATO: da 32px a 40px */
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 12px;
   font-weight: 600;
-  font-size: 16px; /* ✅ AUMENTATO: da 14px a 16px */
+  font-size: 16px;
 }
 
 .avatar-initials {
@@ -259,7 +285,7 @@ export default {
   font-weight: 600;
   color: #262626;
   text-decoration: none;
-  font-size: 16px; /* ✅ AUMENTATO: da 14px a 16px */
+  font-size: 16px;
 }
 
 .username:hover {
@@ -276,19 +302,19 @@ export default {
 .post-image {
   width: 100%;
   height: auto;
-  max-height: 700px; /* ✅ AUMENTATO: da 600px a 700px */
+  max-height: 700px;
   object-fit: cover;
   cursor: pointer;
   display: block;
 }
 
 .post-actions {
-  padding: 16px; /* ✅ AUMENTATO: da 12px 16px 4px a 16px */
+  padding: 16px;
 }
 
 .action-buttons {
   display: flex;
-  gap: 20px; /* ✅ AUMENTATO: da 16px a 20px */
+  gap: 20px;
 }
 
 .action-btn {
@@ -297,7 +323,7 @@ export default {
   color: #262626;
   cursor: pointer;
   padding: 8px;
-  font-size: 28px; /* ✅ AUMENTATO: da 24px a 28px */
+  font-size: 28px;
   transition: color 0.2s ease;
 }
 
@@ -318,19 +344,19 @@ export default {
 
 .post-stats {
   padding: 0 16px;
-  margin-bottom: 12px; /* ✅ AUMENTATO: da 8px a 12px */
+  margin-bottom: 12px;
 }
 
 .likes-count {
-  font-size: 16px; /* ✅ AUMENTATO: da 14px a 16px */
+  font-size: 16px;
   color: #262626;
 }
 
 .post-caption {
   padding: 0 16px;
-  margin-bottom: 8px; /* ✅ AUMENTATO: da 4px a 8px */
-  font-size: 16px; /* ✅ AUMENTATO: da 14px a 16px */
-  line-height: 20px; /* ✅ AUMENTATO: da 18px a 20px */
+  margin-bottom: 8px; 
+  font-size: 16px; 
+  line-height: 20px; 
 }
 
 .caption-text {
@@ -340,7 +366,7 @@ export default {
 
 .comments-preview {
   padding: 0 16px;
-  margin-bottom: 12px; /* ✅ AUMENTATO: da 8px a 12px */
+  margin-bottom: 12px; 
 }
 
 .view-comments-btn {
@@ -348,7 +374,7 @@ export default {
   border: none;
   color: #8e8e8e;
   cursor: pointer;
-  font-size: 16px; /* ✅ AUMENTATO: da 14px a 16px */
+  font-size: 16px;
   padding: 0;
 }
 
@@ -358,10 +384,19 @@ export default {
 
 .post-timestamp {
   padding: 0 16px 16px;
-  font-size: 12px; /* ✅ MANTENUTO */
+  font-size: 12px; 
   color: #8e8e8e;
   text-transform: uppercase;
   letter-spacing: 0.2px;
+}
+
+.likes-button {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.likes-button:hover {
+  color: #8e8e8e;
 }
 
 @media (max-width: 768px) {

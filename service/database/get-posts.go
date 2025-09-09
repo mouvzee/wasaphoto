@@ -52,7 +52,7 @@ func (db *appdbimpl) GetPosts(profileUserID int, requestingUserID int) ([]Photo,
 			return nil, err
 		}
 
-		// Get like status - CORREZIONE: usa requestingUserID invece di profileUserID
+		// Get like status
 		var like int
 		err = db.c.QueryRow(query_ISLIKED, post.PhotoID, requestingUserID).Scan(&like)
 		if err != nil {

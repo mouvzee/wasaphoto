@@ -71,12 +71,10 @@ export default {
         return imageData;
       }
       
-      // Se imageData è una stringa base64
       if (typeof imageData === 'string' && imageData.startsWith('data:image')) {
         return imageData;
       }
       
-      // Se imageData è una stringa base64 senza prefisso
       if (typeof imageData === 'string') {
         return `data:image/jpeg;base64,${imageData}`;
       }

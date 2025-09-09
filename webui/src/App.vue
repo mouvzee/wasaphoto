@@ -3,7 +3,7 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <script>
-import { setAuth, validateToken } from '@/services/axios.js'
+import { setAuth, validateToken, clearAuthData } from '@/services/axios.js'
 
 export default {
   data() {
@@ -49,13 +49,23 @@ export default {
     async initializeAuth() {
       try {
         const isValid = await validateToken();
-        if (!isValid && !this.isLoginPage) {
-          // Token non valido e non siamo nella pagina di login
-          this.$router.push('/login');
+        
+        if (!isValid) {
+          clearAuthData();
+          this.reactiveUserId = null;
+          
+          if (!this.isLoginPage) {
+            this.$router.push('/login');
+          }
+        } else {
+          setAuth();
+          this.updateCurrentUser();
         }
-        setAuth();
       } catch (error) {
-        console.error('Error validating token:', error);
+        console.error('Error initializing auth:', error);
+        clearAuthData();
+        this.reactiveUserId = null;
+        
         if (!this.isLoginPage) {
           this.$router.push('/login');
         }
@@ -77,6 +87,7 @@ export default {
         
         if (!user || !user.UserID || user.UserID === 0) {
           this.reactiveUserId = null;
+          clearAuthData();
           return;
         }
         
@@ -87,14 +98,12 @@ export default {
       } catch (error) {
         console.error('App.vue - Error parsing user:', error);
         this.reactiveUserId = null;
-        localStorage.clear();
+        clearAuthData();
       }
     },
     
     logout() {
-      localStorage.clear();
-      setAuth();
-      // Forza l'aggiornamento dell'utente corrente
+      clearAuthData();
       this.reactiveUserId = null;
       this.$router.push('/login');
     },

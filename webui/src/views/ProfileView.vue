@@ -19,10 +19,10 @@
       />
 
       <!-- Sezione posts -->
-      <div v-if="profile && !error" class="posts-section mt-4">
+      <div v-if="profile && !error" class="posts-section mt-4" ref="postsSection">
 
         <!-- Griglia posts -->
-        <div v-if="posts.length > 0" class="posts-grid">
+        <div class="posts-grid">
           <PostCard
             v-for="post in posts" 
             :key="post.PhotoID"
@@ -30,14 +30,10 @@
             @click="openPostModal"
           />
         </div>
-
-        <!-- Messaggio se non ci sono posts -->
-        <div v-else class="no-posts text-center py-5">
-          <i class="fas fa-camera fa-3x text-muted mb-3"></i>
-          <h4 class="text-muted">No posts yet</h4>
-          <p v-if="isOwnProfile" class="text-muted">
-            Share your first photo to get started
-          </p>
+        
+        <!-- Empty state per i post -->
+        <div v-if="posts.length === 0" class="no-posts">
+          <p class="text-muted">No posts yet</p>
         </div>
       </div>
 
@@ -53,8 +49,8 @@
               <div v-if="followers.length > 0" class="users-list">
                 <div v-for="follower in followers" :key="follower.UserID" class="user-item">
                   <div class="user-info">
-                    <div class="user-avatar">
-                      <i class="fas fa-user"></i>
+                    <div class="user-avatar" :style="getUserAvatarStyle(follower.Username)">
+                      <span class="avatar-initials">{{ getUserInitials(follower.Username) }}</span>
                     </div>
                     <RouterLink 
                       :to="`/profiles/${follower.UserID}`" 
@@ -86,8 +82,8 @@
               <div v-if="following.length > 0" class="users-list">
                 <div v-for="user in following" :key="user.UserID" class="user-item">
                   <div class="user-info">
-                    <div class="user-avatar">
-                      <i class="fas fa-user"></i>
+                    <div class="user-avatar" :style="getUserAvatarStyle(user.Username)">
+                      <span class="avatar-initials">{{ getUserInitials(user.Username) }}</span>
                     </div>
                     <RouterLink 
                       :to="`/profiles/${user.UserID}`" 
@@ -154,8 +150,8 @@
               <div v-if="bannedUsers.length > 0" class="users-list">
                 <div v-for="user in bannedUsers" :key="user.UserID" class="user-item">
                   <div class="user-info">
-                    <div class="user-avatar">
-                      <i class="fas fa-user"></i>
+                    <div class="user-avatar" :style="getUserAvatarStyle(user.Username)">
+                      <span class="avatar-initials">{{ getUserInitials(user.Username) }}</span>
                     </div>
                     <span class="username">{{ user.Username }}</span>
                   </div>
@@ -221,7 +217,7 @@ export default {
       editError: null,
 
       // Post modal
-      selectedPost: null
+      selectedPost: null,
     }
   },
   computed: {
@@ -489,7 +485,7 @@ export default {
         
         this.$forceUpdate();
       }
-    }
+    },
   }
 }
 </script>
@@ -581,15 +577,19 @@ export default {
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background-color: #f0f0f0;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 12px;
-  color: #8e8e8e;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.avatar-initials {
+  line-height: 1;
 }
 
 .username {

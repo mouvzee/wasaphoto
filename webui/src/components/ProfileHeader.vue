@@ -5,7 +5,6 @@
       <div class="col-md-4 text-center">
         <div class="profile-avatar">
           <div class="avatar-circle" :style="avatarStyle">
-            <!-- ✅ Mostra iniziali invece dell'icona -->
             <span class="avatar-initials">{{ userInitials }}</span>
           </div>
         </div>

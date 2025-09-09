@@ -150,9 +150,15 @@
                   <i class="fas fa-comment fa-lg"></i>
                 </button>
               </div>
-              
+
               <div class="likes-count">
-                <strong>{{ post.Nlike }} {{ post.Nlike === 1 ? 'like' : 'likes' }}</strong>
+                <strong 
+                  class="likes-button" 
+                  @click="showLikesList"
+                  v-if="post.Nlike > 0"
+                >
+                  {{ post.Nlike }} {{ post.Nlike === 1 ? 'like' : 'likes' }}
+                </strong>
               </div>
               
               <!-- Form nuovo commento -->
@@ -186,6 +192,38 @@
         </div>
       </LoadingSpinner>
       
+      <div v-if="showLikesModal" class="likes-modal-overlay" @click="closeLikesModal">
+        <div class="likes-modal-content" @click.stop>
+          <div class="likes-modal-header">
+            <h5>Likes</h5>
+            <button class="btn-close-likes" @click="closeLikesModal">&times;</button>
+          </div>
+          <div class="likes-modal-body">
+            <LoadingSpinner :loading="loadingLikes">
+              <div v-if="likes.length > 0" class="likes-list">
+                <div v-for="like in likes" :key="like.UserID" class="like-item">
+                  <div class="like-user-info">
+                    <div class="like-user-avatar" :style="getLikeUserAvatarStyle(like.Username)">
+                      <span class="like-avatar-initials">{{ getLikeUserInitials(like.Username) }}</span>
+                    </div>
+                    <RouterLink 
+                      :to="`/profiles/${like.UserID}`" 
+                      class="like-username"
+                      @click="closeLikesModal"
+                    >
+                      {{ like.Username }}
+                    </RouterLink>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="text-center text-muted">
+                No likes yet
+              </div>
+            </LoadingSpinner>
+          </div>
+        </div>
+      </div>
+      
       <ErrorMsg v-if="error" :msg="error" />
     </div>
   </div>
@@ -216,7 +254,11 @@ export default {
       showCommentMenu: null,
       
       // Like
-      likingInProgress: false
+      likingInProgress: false,
+
+      showLikesModal: false,
+      likes: [],
+      loadingLikes: false
     }
   },
   computed: {
@@ -239,13 +281,12 @@ export default {
     isOwner() {
       return this.post && this.currentUserId && this.post.UserID === this.currentUserId;
     },
-    // ✅ NUOVO: Avatar initials come in FeedPost
+    
     userInitials() {
       if (!this.post?.Username) return '?';
       return this.post.Username.charAt(0).toUpperCase();
     },
     
-    // ✅ NUOVO: Avatar style come in FeedPost
     avatarStyle() {
       const username = this.post?.Username || 'default';
       const colors = [
@@ -330,6 +371,58 @@ export default {
       } finally {
         this.loadingComments = false;
       }
+    },
+
+    showLikesList() {
+      this.showLikesModal = true;
+      this.loadLikes();
+    },
+
+    closeLikesModal() {
+      this.showLikesModal = false;
+      this.likes = [];
+    },
+
+    async loadLikes() {
+      this.loadingLikes = true;
+      try {
+        const response = await this.$axios.get(
+          `/profiles/${this.post.UserID}/posts/${this.post.PhotoID}/likes`
+        );
+        
+        this.likes = response.data || [];
+        
+      } catch (error) {
+        console.error('Error loading likes:', error);
+        this.likes = [];
+      } finally {
+        this.loadingLikes = false;
+      }
+    },
+
+    getLikeUserInitials(username) {
+      if (!username) return '?';
+      return username.charAt(0).toUpperCase();
+    },
+
+    getLikeUserAvatarStyle(username) {
+      const colors = [
+        '#e74c3c', '#3498db', '#2ecc71', '#f39c12', 
+        '#9b59b6', '#1abc9c', '#34495e', '#e67e22'
+      ];
+      
+      const usernameStr = username || 'default';
+      let hash = 0;
+      for (let i = 0; i < usernameStr.length; i++) {
+        hash = usernameStr.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      
+      const color = colors[Math.abs(hash) % colors.length];
+      
+      return {
+        backgroundColor: color,
+        color: 'white'
+      };
     },
 
     async toggleLike() {
@@ -846,6 +939,120 @@ export default {
 
 .input-group .btn:not(:disabled):hover {
   color: #0056b3;
+}
+
+.likes-button {
+  cursor: pointer;
+  transition: color 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.likes-button:hover {
+  color: #8e8e8e;
+}
+
+/* Likes Modal */
+.likes-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000; /* Più alto del modal principale */
+}
+
+.likes-modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 70vh;
+  overflow: hidden;
+}
+
+.likes-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e1e8ed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.likes-modal-header h5 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.likes-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
+.btn-close-likes {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #8e8e8e;
+  line-height: 1;
+}
+
+.likes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.like-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.like-item:last-child {
+  border-bottom: none;
+}
+
+.like-user-info {
+  display: flex;
+  align-items: center;
+}
+
+.like-user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.like-avatar-initials {
+  line-height: 1;
+}
+
+.like-username {
+  color: #262626;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.like-username:hover {
+  color: #262626;
+  text-decoration: none;
 }
 
 @media (max-width: 768px) {
