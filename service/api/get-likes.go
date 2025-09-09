@@ -19,13 +19,13 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	// Get the profileUserID and PhotoID from the URL
 	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
 	photoID, err := strconv.Atoi(ps.ByName("photoID"))
 	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 

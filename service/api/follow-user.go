@@ -22,18 +22,18 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	// Get the profileUserID and targetUserID from the URL
 	profileUserID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
 	targetUserID, err := strconv.Atoi(ps.ByName("targetUserID"))
 	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
 	if profileUserID != ctx.UserID {
-		http.Error(w, "Forbidden", http.StatusBadRequest)
+		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
 

@@ -16,14 +16,14 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	// Get the user ID from the URL
 	userID, err := strconv.Atoi(ps.ByName("userID"))
 	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 
 	// Get the post ID from the URL
 	photoID, err := strconv.Atoi(ps.ByName("photoID"))
 	if err != nil {
-		http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
 	}
 	// Print all parameters in ps
@@ -33,7 +33,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	// token, err := strconv.Atoi(ps.ByName("Token"))
 	// if err != nil {
-	// 	http.Error(w, "Bad Request"+err.Error(), http.StatusBadRequest)
+	// 	http.Error(w, "Bad Request",err.Error(), http.StatusBadRequest)
 	// 	return
 	// }
 

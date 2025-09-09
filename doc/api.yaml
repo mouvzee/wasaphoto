@@ -8,7 +8,7 @@ info:
 tags:
 - name: Login
   description: Everything about login
-- name: Photo
+- name: Posts
   description: Everything about photos
 - name: User
   description: Everything about user
@@ -22,6 +22,7 @@ paths:
       security: []
       tags: [ "Login" ]
       operationId: doLogin
+      description: Logins a user
       requestBody:
         description: User credentials
         content:
@@ -31,7 +32,7 @@ paths:
               type: object
               properties:
                 username:
-                  $ref: "#/components/schemas/Username" 
+                  $ref: "#/components/schemas/Username"
         required: true
       responses:
         "200":
@@ -165,14 +166,14 @@ paths:
                     maxItems: 50
                     items:
                       $ref: "#/components/schemas/User"
-        "400": 
-          $ref: "#/components/responses/BadRequest" 
-        "401": 
-          $ref: "#/components/responses/Unauthorized" 
-        "403": 
-          $ref: "#/components/responses/Forbidden" 
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /profiles/{userID}/followers:
     parameters:
       - $ref: "#/components/parameters/userID"
@@ -197,14 +198,14 @@ paths:
                     maxItems: 50
                     items:
                       $ref: "#/components/schemas/User"
-        "400":  
-          $ref: "#/components/responses/BadRequest" 
-        "401": 
-          $ref: "#/components/responses/Unauthorized" 
-        "403": 
-          $ref: "#/components/responses/Forbidden" 
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /profiles/{userID}/bans/{targetUserID}:
     parameters:
       - $ref: "#/components/parameters/userID"
@@ -220,13 +221,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User" 
-        "400": 
-          $ref: "#/components/responses/BadRequest" 
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
     delete:
       summary: Unban a user
       tags: [ "User" ]
@@ -238,13 +239,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User" 
+                $ref: "#/components/schemas/User"
         "400":
-          $ref: "#/components/responses/BadRequest" 
-        "401":  
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /profiles/{userID}/bans:
     parameters:
       - $ref: "#/components/parameters/userID"
@@ -268,15 +269,15 @@ paths:
                     minItems: 0
                     maxItems: 50
                     items:
-                      $ref: "#/components/schemas/User" 
+                      $ref: "#/components/schemas/User"
         "400":
-          $ref: "#/components/responses/BadRequest" 
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden" 
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /profiles/{userID}/posts:
     parameters:
       - $ref: "#/components/parameters/userID"
@@ -305,7 +306,7 @@ paths:
               type: object
               properties:
                 imageData:
-                  $ref: "#/components/schemas/ImageData" 
+                  $ref: "#/components/schemas/ImageData"
       responses:
         "201":
           description: Post created
@@ -313,14 +314,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Photo"
-        "400": 
-          $ref: "#/components/responses/BadRequest" 
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden" 
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
     get:
       summary: Get user posts
       tags: [ "Posts" ]
@@ -343,18 +344,18 @@ paths:
                     minItems: 0
                     maxItems: 50
         "400":
-          $ref: "#/components/responses/BadRequest" 
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden" 
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /profiles/{userID}/posts/{photoID}:
     parameters:
       - $ref: "#/components/parameters/userID"
       - $ref: "#/components/parameters/photoID"
-      
+
     delete:
       summary: Delete a post
       tags: [ "Posts" ]
@@ -362,15 +363,15 @@ paths:
       description: Delete the post with the given photoID.
       responses:
         "204":
-          $ref: "#/components/responses/NoContent" 
+          $ref: "#/components/responses/NoContent"
         "400":
-          $ref: "#/components/responses/BadRequest" 
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden" 
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /profiles/{userID}/posts/{photoID}/likes/{likeID}:
     parameters:
       - $ref: "#/components/parameters/userID"
@@ -382,34 +383,34 @@ paths:
       operationId: likePhoto
       description: Like the post with the given photoID.
       responses:
-        "200":  
-          $ref: "#/components/responses/Success" 
+        "200":
+          $ref: "#/components/responses/Success"
         "201":
           $ref: "#/components/responses/Created"
-        "400":  
-          $ref: "#/components/responses/BadRequest" 
-        "401":  
-          $ref: "#/components/responses/Unauthorized" 
-        "403":  
-          $ref: "#/components/responses/Forbidden" 
-        "500":  
-          $ref: "#/components/responses/InternalServerError" 
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     delete:
       summary: Unlike a post
       tags: [ "Posts" ]
       operationId: unlikePhoto
       description: Unlike the post with the given photoID.
       responses:
-        "204": 
+        "204":
           $ref: "#/components/responses/NoContent"
-        "400": 
-          $ref: "#/components/responses/BadRequest" 
-        "401": 
-          $ref: "#/components/responses/Unauthorized" 
-        "403": 
-          $ref: "#/components/responses/Forbidden" 
-        "500": 
-          $ref: "#/components/responses/InternalServerError" 
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
   /profiles/{userID}/posts/{photoID}/likes:
     parameters:
       - $ref: "#/components/parameters/userID"
@@ -436,13 +437,13 @@ paths:
                     minItems: 0
                     maxItems: 50
         "400":
-          $ref: "#/components/responses/BadRequest" 
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden" 
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /profiles/{userID}/posts/{photoID}/comments:
     parameters:
       - $ref: "#/components/parameters/userID"
@@ -470,13 +471,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/Comment"
         "400":
-          $ref: "#/components/responses/BadRequest" 
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden" 
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
     get:
       summary: Get comments on a post
       tags: [ "Posts" ]
@@ -501,11 +502,11 @@ paths:
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden" 
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /profiles/{userID}/posts/{photoID}/comments/{commentID}:
     parameters:
       - $ref: "#/components/parameters/userID"
@@ -518,15 +519,15 @@ paths:
       description: Delete the comment with the given commentID.
       responses:
         "200":
-          $ref: "#/components/responses/Success" 
+          $ref: "#/components/responses/Success"
         "400":
-          $ref: "#/components/responses/BadRequest" 
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden" 
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /profiles/{userID}/feed:
     parameters:
       - $ref: "#/components/parameters/userID"
@@ -552,13 +553,13 @@ paths:
                     items:
                       $ref: "#/components/schemas/Photo"
         "400":
-          $ref: "#/components/responses/BadRequest" 
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden" 
+          $ref: "#/components/responses/Forbidden"
         "500":
-          $ref: "#/components/responses/InternalServerError" 
+          $ref: "#/components/responses/InternalServerError"
   /profiles:
 
     get:
@@ -590,11 +591,11 @@ paths:
                     items:
                       $ref: "#/components/schemas/Username"
         "400":
-          $ref: "#/components/responses/BadRequest" 
+          $ref: "#/components/responses/BadRequest"
         "401":
-          $ref: "#/components/responses/Unauthorized" 
+          $ref: "#/components/responses/Unauthorized"
         "403":
-          $ref: "#/components/responses/Forbidden" 
+          $ref: "#/components/responses/Forbidden"
 
 components:
   schemas:
@@ -606,6 +607,7 @@ components:
         username:
           type: string
           pattern: "^[a-z0-9]{3,13}$"
+          description: User's username
           example: "john123"
           minLength: 3
           maxLength: 13
